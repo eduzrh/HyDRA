@@ -2,7 +2,7 @@
 # HyDRA：面向真实环境的时间知识图谱对齐方法
 
 ![](https://img.shields.io/badge/version-0.0.1-blue)  
-[![欢迎贡献](https://img.shields.io/badge/Contributions-Welcome-brightgreen.svg?style=flat-square)](https://github.com/zrh805/HyDRA/issues)
+[![欢迎贡献](https://img.shields.io/badge/Contributions-Welcome-brightgreen.svg?style=flat-square)](https://github.com/eduzrh/HyDRA/issues)
 
 [English](./README.md) | 简体中文
 
@@ -15,7 +15,7 @@
 如您对本项目有任何疑问或建议，欢迎与我们联系，我们将非常感谢您的反馈！
 
 - 📧 **电子邮箱：** runhaozhao@nudt.edu.cn  
-- 📝 **GitHub Issues：** 如有技术相关问题，欢迎在 [GitHub 主页](https://github.com/zrh805/HyDRA/issues) 提交 issue。
+- 📝 **GitHub Issues：** 如有技术相关问题，欢迎在 [GitHub 主页](https://github.com/eduzrh/HyDRA/issues) 提交 issue。
 
 我们承诺将在 2–3 个工作日内回复所有问题。
 

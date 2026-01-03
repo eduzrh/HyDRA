@@ -7,7 +7,7 @@ English | [简体中文](./README_zh_CN.md)
 
 🚀 Welcome to the repo of **HyDRA**! 🎉🎉🎉
 
-This repository corresponds to the IEEE TPAMI paper under review: ***HyDRA: Temporal Knowledge Graph Alignment in the Wild***. This paper is an extended version of our previous work, [BETA](https://github.com/DexterZeng/BETA).
+This repository corresponds to the IEEE TPAMI paper under review: ***Towards Temporal Knowledge Graph Alignment in the Wild***. This paper is an extended version of our previous work, [BETA](https://github.com/DexterZeng/BETA).
 
 
 

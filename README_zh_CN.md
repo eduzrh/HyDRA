@@ -8,7 +8,7 @@
 
 🎉 欢迎访问 **HyDRA** 项目主页！
 
-本仓库对应论文 ***HyDRA: Temporal Knowledge Graph Alignment in the Wild***（现正投稿于 *IEEE TPAMI*），为我们先前工作 [BETA](https://github.com/DexterZeng/BETA) 的扩展版本。
+本仓库对应论文 ***Towards Temporal Knowledge Graph Alignment in the Wild***（现正投稿于 *IEEE TPAMI*），为我们先前工作 [BETA](https://github.com/DexterZeng/BETA) 的扩展版本。
 
 ## 📬 联系方式
 

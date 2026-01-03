@@ -1,7 +1,7 @@
 # HyDRA
 
 ![](https://img.shields.io/badge/version-0.0.1-blue)
-[![Contributions Welcome](https://img.shields.io/badge/Contributions-Welcome-brightgreen.svg?style=flat-square)](https://github.com/zrh805/HyDRA/issues)
+[![Contributions Welcome](https://img.shields.io/badge/Contributions-Welcome-brightgreen.svg?style=flat-square)](https://github.com/eduzrh/HyDRA/issues)
 
 English | [简体中文](./README_zh_CN.md)
 
@@ -16,7 +16,7 @@ This repository corresponds to the IEEE TPAMI paper under review: ***HyDRA: Temp
 📢 If you have any questions or feedback about this project, please feel free to contact us. We highly appreciate your suggestions!
 
 - 📧 **Email:** runhaozhao@nudt.edu.cn
-- 📝 **GitHub Issues:** For more technical inquiries, you can also create a new issue in our [GitHub repository](https://github.com/zrh805/HyDRA/issues).
+- 📝 **GitHub Issues:** For more technical inquiries, you can also create a new issue in our [GitHub repository](https://github.com/eduzrh/HyDRA/issues).
 
 We will respond to all questions within 2-3 business days.
 

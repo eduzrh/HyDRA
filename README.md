@@ -169,10 +169,10 @@ For our newly proposed **TKGA-Wild** scenario, we introduce two novel benchmark 
 
 <div align="center">
 
-| Dataset | Description | Size |
+| Dataset | Description | Fact Size |
 |:---|:---|:---|
-| **BETA** | Benchmark dataset for TKGA-Wild | - |
-| **WildBETA** | Extended benchmark dataset for TKGA-Wild | - |
+| **BETA** | Benchmark dataset for TKGA-Wild | 362K+ |
+| **WildBETA** | Extended benchmark dataset for TKGA-Wild | 563K+ |
 
 </div>
 

@@ -486,12 +486,12 @@ python HyDRA_main.py --data_dir data/icews_wiki
 * [Faiss: A Library for Efficient Similarity Search and Clustering of Dense Vectors](https://github.com/facebookresearch/faiss).
   Facebook Research.
   GitHub Repository.
-* [DAEA: Enhancing Entity Alignment in Real-World Knowledge Graphs Through Multi-Source Domain Adaptation](https://aclanthology.org/2025.coling-main.393/).
-  Linyan Yang, Shiqiao Zhou, Jingwei Cheng, Fu Zhang, Jizheng Wan, Shuo Wang, and Mark Lee.
-  Proceedings of the 31st International Conference on Computational Linguistics (COLING), 2025.
-* [TGB 2.0: A Benchmark for Learning on Temporal Knowledge Graphs and Heterogeneous Graphs](https://arxiv.org/abs/2406.09639).
-  Julia Gastinger, Shenyang Huang, Mikhail Galkin, Erfan Loghmani, Ali Parviz, Farimah Poursafaei, Jacob Danovitch, Emanuele Rossi, Ioannis Koutis, Heiner Stuckenschmidt, Reihaneh Rabbany, and Guillaume Rabusseau.
-  arXiv preprint arXiv:2406.09639, 2024.
+* [DAEA: Enhancing Entity Alignment in Real-World Knowledge Graphs Through Multi-Source Domain Adaptation](https://aclanthology.org/2025.coling-main.393/)
+  Linyan Yang, Shiqiao Zhou, Jingwei Cheng, Fu Zhang, Jizheng Wan, Shuo Wang, Mark Lee.
+  COLING 2025
+* [TGB 2.0: A Benchmark for Learning on Temporal Knowledge Graphs and Heterogeneous Graphs](https://arxiv.org/abs/2406.09639)
+  Julia Gastinger, Shenyang Huang, Mikhail Galkin, Erfan Loghmani, Ali Parviz, Farimah Poursafaei, Jacob Danovitch, Emanuele Rossi, Ioannis Koutis, Heiner Stuckenschmidt, Reihaneh Rabbany, Guillaume Rabusseau.
+  NeurIPS 2024 Track on Datasets and Benchmarks
 
 
 
@@ -504,6 +504,7 @@ python HyDRA_main.py --data_dir data/icews_wiki
 ---
 
 本仓库对应论文 ***Towards Temporal Knowledge Graph Alignment in the Wild***（投稿于 *IEEE TPAMI*），是我们先前工作 [BETA](https://github.com/DexterZeng/BETA) 的扩展。
+
 
 
 

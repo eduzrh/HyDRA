@@ -180,10 +180,12 @@ For our newly proposed **TKGA-Wild** scenario, we introduce two novel benchmark 
 
 <div align="center">
 
-[![Baidu Netdisk][(https://img.shields.io/badge/Baidu_Netdisk-Download-blue?style=for-the-badge)](https://pan.baidu.com/s/YOUR_LINK_HERE?pwd=YOUR_PWD)](https://pan.baidu.com/s/1TKZvjsDgqUrOAGKe6MRf9A?pwd=pnax)
+[![Baidu Netdisk](https://img.shields.io/badge/Baidu_Netdisk-Download-blue?style=for-the-badge)](https://pan.baidu.com/s/1TKZvjsDgqUrOAGKe6MRf9A?pwd=pnax)
 [![Google Drive](https://img.shields.io/badge/Google_Drive-Download-green?style=for-the-badge)](https://drive.google.com/drive/folders/YOUR_FOLDER_ID)
 
 </div>
+
+> 🔐 **Baidu Netdisk**: Extraction Code: `pnax` | Password: `tkgawild`
 
 **Dataset Format:**
 

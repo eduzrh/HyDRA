@@ -259,33 +259,6 @@ python HyDRA_main.py --data_dir data/icews_wiki
 
 
 
-This executes the complete **HyDRA** pipeline:
-
-
-
-```
-
-┌─────────────────────────────────────────┐
-
-│  Encoding and Integration               │
-
-│           ↓                              │
-
-│  Scale-Adaptive Entity Projection       │
-
-│           ↓                              │
-
-│  Multi-Scale Hypergraph Retrieval       │
-
-│           ↓                              │
-
-│  Multi-Scale Fusion & Refinement        │
-
-└─────────────────────────────────────────┘
-
-```
-
-
 
 ### Step 4: View Results 📊
 
@@ -318,30 +291,6 @@ This executes the complete **HyDRA** pipeline:
 ```bash
 
 python HyDRA_main.py --data_dir data/icews_wiki
-
-```
-
-
-
-**Skip encoding stage (if results already exist):**
-
-
-
-```bash
-
-python HyDRA_main.py --data_dir data/icews_wiki --skip_s4
-
-```
-
-
-
-**Run only encoding stage:**
-
-
-
-```bash
-
-python HyDRA_main.py --data_dir data/icews_wiki --only_s4
 
 ```
 

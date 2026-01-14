@@ -181,7 +181,7 @@ pip install -r requirements.txt
 <div align="center">
 
 [![Baidu Netdisk](https://img.shields.io/badge/Baidu_Netdisk-Download-blue?style=for-the-badge)](https://pan.baidu.com/s/1TKZvjsDgqUrOAGKe6MRf9A?pwd=pnax)
-[![Google Drive](https://img.shields.io/badge/Google_Drive-Download-green?style=for-the-badge)](https://drive.google.com/drive/folders/YOUR_FOLDER_ID)
+[![Google Drive](https://img.shields.io/badge/Google_Drive-Download-green?style=for-the-badge)](https://drive.google.com/drive/folders/1P-YtGgoEh_y2RwKTS-YeM0X1sdWlWDEV?usp=sharing)
 
 </div>
 
@@ -565,4 +565,5 @@ python HyDRA_main.py --data_dir data/icews_wiki
 ---
 
 本仓库对应论文 ***Towards Temporal Knowledge Graph Alignment in the Wild***（投稿于 *IEEE TPAMI*），是我们之前工作 [BETA](https://github.com/DexterZeng/BETA) 的扩展。
+
 

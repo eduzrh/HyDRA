@@ -56,15 +56,15 @@
 
 ---
 
-## 📰 简介
+# 📰 简介
 
 
 
-**真实场景下的时序知识图谱对齐 (TKGA-Wild)** 解决了时序知识图谱集成中的一个关键挑战。据我们所知，这是**首个**正式提出并解决该问题的工作，我们将其称为 **TKGA-Wild**。由于真实场景中常见的**多尺度时序元素**（即多粒度时序共存和时序跨度差异）和**非对称时序结构**（即异构时序结构和时序结构不完整性），该任务面临着独特的挑战。
+**真实场景下的时序知识图谱对齐（TKGA-Wild）** 解决了时序知识图谱集成中的一个关键挑战。据我们所知，这是**首个**正式提出并解决该问题的工作，我们将其称为 **TKGA-Wild**。由于**多尺度时序元素**（即多粒度时序共存和时序跨度差异）和**非对称时序结构**（即异构时序结构和时序结构不完整性）在真实场景中普遍存在，该任务面临着独特的挑战。
 
 
 
-为了弥合这一差距，我们提出了 **HyDRA**，这是一种基于**多尺度超图检索增强生成**的新范式，以系统性地解决 TKGA-Wild 的独特挑战。HyDRA 有效捕获复杂的结构依赖关系，建模多粒度时序特征，缓解时序差异，并引入了一种新的**尺度编织协同机制**来协调不同时序尺度的信息。
+为了弥合这一差距，我们提出了 **HyDRA**，这是一种基于**多尺度超图检索增强生成**的新范式，以系统性地解决 TKGA-Wild 的独特挑战。HyDRA 有效捕获复杂的结构依赖关系，建模多粒度时序特征，缓解时序差异，并引入了一种新的**尺度交织协同机制**来协调不同时序尺度的信息。
 
 
 
@@ -79,7 +79,7 @@
 | **多粒度时序编码** | 🔄 | 在不同尺度（年、月、日）捕获时序信息 |
 | **尺度自适应实体投影** | 📐 | 跨不同图尺度和维度的自适应实体投影 |
 | **多尺度超图检索** | 🔍 | 基于超图的高效神经检索 |
-| **尺度编织协同** | 🔗 | 协调不同时序尺度的信息 |
+| **尺度交织协同** | 🔗 | 协调不同时序尺度的信息 |
 | **最先进的性能** | 📈 | 持续超越 28 个竞争基线，在 Hits@1 上实现高达 43.3% 的提升 |
 
 </div>
@@ -88,8 +88,6 @@
 
 ---
 
-
-
 ## 🏗️ 架构
 
 
@@ -97,25 +95,25 @@
 HyDRA 采用**多尺度超图检索增强生成**范式，包含以下几个关键阶段：
 
 
-阶段 1: 编码与集成 🔄
 
-
-阶段 2: 尺度自适应实体投影 📐
-
-阶段 3: 多尺度超图检索 🔍
-
-
-阶段 4: 多尺度融合 🔗
+阶段 1：编码与集成 🔄
 
 
 
-> 📖 有关详细的架构描述和理论基础，请参考相关论文。
+阶段 2：尺度自适应实体投影 📐
+
+阶段 3：多尺度超图检索 🔍
+
+
+阶段 4：多尺度融合 🔗
+
+
+
+> 📖 有关详细的架构描述和理论基础，请参考随附的论文。
 
 
 
 ---
-
-
 
 ## ⚙️ 安装
 
@@ -143,9 +141,9 @@ pip install -r requirements.txt
 
 | 包 | 版本 | 用途 |
 |:---|:---:|:---|
-| 🐍 **Python** | >= 3.7 | 核心语言（已在 3.8.10 上测试） |
+| 🐍 **Python** | >= 3.7 | 核心语言（测试于 3.8.10） |
 | 🔥 **PyTorch** | >= 1.10.0 | 深度学习框架 |
-| 🔍 **Faiss** | >= 1.7.0 | 高效相似度搜索（CPU/GPU） |
+| 🔍 **Faiss** | >= 1.7.0 | 高效相似性搜索（CPU/GPU） |
 | 📊 **NumPy** | >= 1.21.0 | 数值计算 |
 | 🐼 **Pandas** | >= 1.3.0 | 数据处理 |
 | ⏳ **Tqdm** | >= 4.62.0 | 进度条 |
@@ -159,20 +157,18 @@ pip install -r requirements.txt
 
 ---
 
-
-
 ## 📦 数据集
 
 
 
-针对我们新提出的 **TKGA-Wild** 场景，我们引入了两个新的基准数据集：**BETA** 和 **WildBETA**。
+对于我们新提出的 **TKGA-Wild** 场景，我们引入了两个新的基准数据集：**BETA** 和 **WildBETA**。
 
 <div align="center">
 
-| 数据集 | 描述 | 大小 |
+| 数据集 | 描述 | 事实规模 |
 |:---|:---|:---|
-| **BETA** | TKGA-Wild 的基准数据集 | - |
-| **WildBETA** | TKGA-Wild 的扩展基准数据集 | - |
+| **BETA** | TKGA-Wild 的基准数据集 | 362K+ |
+| **WildBETA** | TKGA-Wild 的扩展基准数据集 | 563K+ |
 
 </div>
 
@@ -185,7 +181,7 @@ pip install -r requirements.txt
 
 </div>
 
-> 🔐 **百度网盘**: 提取码: `pnax` | 密码: `tkgawild`
+> 🔐 **百度网盘**：提取码：`pnax` | 密码：`tkgawild`
 
 **数据集格式：**
 
@@ -213,19 +209,17 @@ pip install -r requirements.txt
 
 
 
-**注意：** 实验中使用的标准时序知识图谱对齐数据集来源于 [Dual-AMN](https://github.com/MaoXinn/Dual-AMN)、[JAPE](https://github.com/nju-websoft/JAPE)、[GCN-Align](https://github.com/1049451037/GCN-Align)、[BETA](https://github.com/DexterZeng/BETA) 及相关工作。
+**注意：** 实验中使用的代表性数据集来源于 [Dual-AMN](https://github.com/MaoXinn/Dual-AMN)、[JAPE](https://github.com/nju-websoft/JAPE)、[GCN-Align](https://github.com/1049451037/GCN-Align)、[BETA](https://github.com/DexterZeng/BETA)、[DAEA](https://github.com/yangxiaoxiaoly/DAEA)、[AGROLD, DOREMUS](https://github.com/EnsiyehRaoufi/Create_Input_Data_to_EA_Models) 及相关工作。
 
 
 
 ---
 
-
-
 ## 🚀 快速开始
 
 
 
-### 步骤 1: 克隆仓库 📥
+### 步骤 1：克隆仓库 📥
 
 
 
@@ -239,7 +233,7 @@ cd HyDRA
 
 
 
-### 步骤 2: 准备数据集 📦
+### 步骤 2：准备数据集 📦
 
 
 
@@ -247,7 +241,7 @@ cd HyDRA
 
 
 
-### 步骤 3: 运行主实验 ▶️
+### 步骤 3：运行主实验 ▶️
 
 
 
@@ -259,49 +253,17 @@ python HyDRA_main.py --data_dir data/icews_wiki
 
 
 
-这将执行完整的 **HyDRA** 流程：
-
-
-
-```
-
-┌─────────────────────────────────────────┐
-
-│  编码与集成                               │
-
-│           ↓                              │
-
-│  尺度自适应实体投影                       │
-
-│           ↓                              │
-
-│  多尺度超图检索                           │
-
-│           ↓                              │
-
-│  多尺度融合与优化                         │
-
-└─────────────────────────────────────────┘
-
-```
-
-
-
-### 步骤 4: 查看结果 📊
+### 步骤 4：查看结果 📊
 
 
 
 | 指标 | 描述 |
 |:---|:---|
 | **Hits@1** | 排名第一的正确对齐比例 |
-| **Hits@10** | 前 10 候选中的比例 |
+| **Hits@10** | 前 10 名候选中的比例 |
 | **MRR** | 平均倒数排名 |
 
-
-
 ---
-
-
 
 ## 📖 使用说明
 
@@ -318,30 +280,6 @@ python HyDRA_main.py --data_dir data/icews_wiki
 ```bash
 
 python HyDRA_main.py --data_dir data/icews_wiki
-
-```
-
-
-
-**跳过编码阶段（如果结果已存在）：**
-
-
-
-```bash
-
-python HyDRA_main.py --data_dir data/icews_wiki --skip_s4
-
-```
-
-
-
-**仅运行编码阶段：**
-
-
-
-```bash
-
-python HyDRA_main.py --data_dir data/icews_wiki --only_s4
 
 ```
 
@@ -376,10 +314,10 @@ python HyDRA_main.py --data_dir data/icews_wiki \
 | `--data_dir` | str | **必需** | 数据集目录路径 |
 | `--skip_s4` | flag | False | 跳过编码阶段（如果结果已存在） |
 | `--only_s4` | flag | False | 仅运行编码阶段 |
-| `--cuda` | int | 0 | 训练使用的 CUDA 设备 ID |
+| `--cuda` | int | 0 | 用于训练的 CUDA 设备 ID |
 | `--epochs` | int | 500 | 编码阶段的训练轮数 |
-| `--max_iterations` | int | 3 | 流程的最大迭代次数 |
-| `--min_kg1_entities` | int | 50 | 停止的最小实体数阈值 |
+| `--max_iterations` | int | 3 | 最大流程迭代次数 |
+| `--min_kg1_entities` | int | 50 | 停止的最小实体阈值 |
 
 
 
@@ -387,13 +325,11 @@ python HyDRA_main.py --data_dir data/icews_wiki \
 
 
 
-HyDRA 支持多粒度时序建模（年和月级别）来处理多粒度时序共存。此功能可通过编码阶段配置启用。
+HyDRA 支持多粒度时序建模（年和月级别）以处理多粒度时序共存。此功能可通过编码阶段配置启用。
 
 
 
 ---
-
-
 
 ## 🔬 可复现性
 
@@ -407,11 +343,11 @@ HyDRA 支持多粒度时序建模（年和月级别）来处理多粒度时序�
 
 
 
-- **超参数**: 所有超参数设置都在代码中记录，可通过命令行参数配置
+- **超参数**：所有超参数设置都在代码中记录，可通过命令行参数配置
 
-- **随机种子**: 种子配置嵌入在训练脚本中以确保可复现性
+- **随机种子**：种子配置嵌入在训练脚本中以确保可复现性
 
-- **环境**: 在 Python 3.8.10 上测试，依赖项如 `requirements.txt` 中指定
+- **环境**：在 Python 3.8.10 上测试，依赖项如 `requirements.txt` 中指定
 
 
 
@@ -449,13 +385,13 @@ python HyDRA_main.py --data_dir data/icews_wiki
 
 
 
-- `encoding_and_integration/`: 多粒度时序实体编码与集成
+- `encoding_and_integration/`: 多粒度时序实体编码和集成
 
 - `scale_adaptive_entity_projection/`: 关系对齐和实体投影
 
 - `multi_scale_hypergraph_retrieval/`: 神经检索和超图分解
 
-- `multi_scale_fusion/`: 多尺度融合和对齐优化
+- `multi_scale_fusion/`: 多尺度融合和对齐细化
 
 - `HyDRA_main.py`: 主流程编排器
 
@@ -469,7 +405,7 @@ python HyDRA_main.py --data_dir data/icews_wiki
 
 - 清晰的模块结构，采用标准化命名约定
 
-- 本 README 提供分步使用说明
+- 本 README，包含逐步使用说明
 
 
 
@@ -483,11 +419,11 @@ python HyDRA_main.py --data_dir data/icews_wiki
 
 
 
-- **Hits@1**: 排名第一的正确对齐比例
+- **Hits@1**：排名第一的正确对齐比例
 
-- **Hits@10**: 前 10 候选中的正确对齐比例  
+- **Hits@10**：前 10 名候选中的正确对齐比例  
 
-- **MRR (平均倒数排名)**: 正确对齐的平均倒数排名
+- **MRR（平均倒数排名）**：正确对齐的平均倒数排名
 
 
 
@@ -495,9 +431,9 @@ python HyDRA_main.py --data_dir data/icews_wiki
 
 
 
-- **邮箱**: [runhaozhao@nudt.edu.cn](mailto:runhaozhao@nudt.edu.cn)
+- **邮箱**：[runhaozhao@nudt.edu.cn](mailto:runhaozhao@nudt.edu.cn)
 
-- **GitHub Issues**: 对于技术问题，请在 [GitHub 仓库](https://github.com/eduzrh/HyDRA/issues) 中创建 Issue。标签：`bug`、`enhancement`、`question`。
+- **GitHub Issues**：对于技术问题，请在 [GitHub 仓库](https://github.com/eduzrh/HyDRA/issues) 中创建 Issue。标签：`bug`、`enhancement`、`question`。
 
 
 
@@ -514,9 +450,6 @@ python HyDRA_main.py --data_dir data/icews_wiki
 
 
 ---
-
-
-
 
 ## 🔗 参考文献
 
@@ -553,17 +486,26 @@ python HyDRA_main.py --data_dir data/icews_wiki
 * [Faiss: A Library for Efficient Similarity Search and Clustering of Dense Vectors](https://github.com/facebookresearch/faiss).
   Facebook Research.
   GitHub Repository.
+* [DAEA: Enhancing Entity Alignment in Real-World Knowledge Graphs Through Multi-Source Domain Adaptation](https://aclanthology.org/2025.coling-main.393/).
+  Linyan Yang, Shiqiao Zhou, Jingwei Cheng, Fu Zhang, Jizheng Wan, Shuo Wang, and Mark Lee.
+  Proceedings of the 31st International Conference on Computational Linguistics (COLING), 2025.
+* [TGB 2.0: A Benchmark for Learning on Temporal Knowledge Graphs and Heterogeneous Graphs](https://arxiv.org/abs/2406.09639).
+  Julia Gastinger, Shenyang Huang, Mikhail Galkin, Erfan Loghmani, Ali Parviz, Farimah Poursafaei, Jacob Danovitch, Emanuele Rossi, Ioannis Koutis, Heiner Stuckenschmidt, Reihaneh Rabbany, and Guillaume Rabusseau.
+  arXiv preprint arXiv:2406.09639, 2024.
 
 
 
 ## 🙏 致谢
 
-以下开源项目在本工作中被部分引用。我们衷心感谢他们的贡献：
+以下开源项目在本工作中被部分引用。我们真诚地感谢他们的贡献：
 
-[Dual-AMN](https://github.com/MaoXinn/Dual-AMN), [JAPE](https://github.com/nju-websoft/JAPE), [GCN-Align](https://github.com/1049451037/GCN-Align), [Simple-HHEA](https://github.com/IDEA-FinAI/Simple-HHEA), [BETA](https://github.com/DexterZeng/BETA), [Dual-Match](https://github.com/ZJU-DAILY/DualMatch/), [Faiss](https://github.com/facebookresearch/faiss), [NetworkX](https://github.com/networkx/networkx), [AdaCoAgentEA](https://github.com/eduzrh/AdaCoAgentEA)
+[Dual-AMN](https://github.com/MaoXinn/Dual-AMN), [JAPE](https://github.com/nju-websoft/JAPE), [GCN-Align](https://github.com/1049451037/GCN-Align), [Simple-HHEA](https://github.com/jxh4945777/Simple-HHEA), [BETA](https://github.com/DexterZeng/BETA), [Dual-Match](https://github.com/ZJU-DAILY/DualMatch/), [Faiss](https://github.com/facebookresearch/faiss), [NetworkX](https://github.com/networkx/networkx), [AdaCoAgentEA](https://github.com/eduzrh/AdaCoAgentEA), [DAEA](https://github.com/yangxiaoxiaoly/DAEA), [AGROLD, DOREMUS](https://github.com/EnsiyehRaoufi/Create_Input_Data_to_EA_Models)
 
 ---
 
-本仓库对应论文 ***Towards Temporal Knowledge Graph Alignment in the Wild***（投稿于 *IEEE TPAMI*），是我们之前工作 [BETA](https://github.com/DexterZeng/BETA) 的扩展。
+本仓库对应论文 ***Towards Temporal Knowledge Graph Alignment in the Wild***（投稿于 *IEEE TPAMI*），是我们先前工作 [BETA](https://github.com/DexterZeng/BETA) 的扩展。
+
+
+
 
 

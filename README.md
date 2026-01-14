@@ -181,7 +181,7 @@ For our newly proposed **TKGA-Wild** scenario, we introduce two novel benchmark 
 <div align="center">
 
 [![Baidu Netdisk](https://img.shields.io/badge/Baidu_Netdisk-Download-blue?style=for-the-badge)](https://pan.baidu.com/s/1TKZvjsDgqUrOAGKe6MRf9A?pwd=pnax)
-[![Google Drive](https://img.shields.io/badge/Google_Drive-Download-green?style=for-the-badge)](https://drive.google.com/drive/folders/YOUR_FOLDER_ID)
+[![Google Drive](https://img.shields.io/badge/Google_Drive-Download-green?style=for-the-badge)](https://drive.google.com/drive/folders/1P-YtGgoEh_y2RwKTS-YeM0X1sdWlWDEV?usp=sharing)
 
 </div>
 

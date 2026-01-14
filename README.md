@@ -213,7 +213,7 @@ Take the dataset `icews_wiki` as an example, the folder `data/icews_wiki/` shoul
 
 
 
-**Note:** The representative datasets used in experiments are derived from [Dual-AMN](https://github.com/MaoXinn/Dual-AMN), [JAPE](https://github.com/nju-websoft/JAPE), [GCN-Align](https://github.com/1049451037/GCN-Align), [BETA](https://github.com/DexterZeng/BETA) and related works.
+**Note:** The representative datasets used in experiments are derived from [Dual-AMN](https://github.com/MaoXinn/Dual-AMN), [JAPE](https://github.com/nju-websoft/JAPE), [GCN-Align](https://github.com/1049451037/GCN-Align), [BETA](https://github.com/DexterZeng/BETA), [DAEA](https://github.com/yangxiaoxiaoly/DAEA), [AGROLD, DOREMUS](https://github.com/EnsiyehRaoufi/Create_Input_Data_to_EA_Models) and related works.
 
 
 

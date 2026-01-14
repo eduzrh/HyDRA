@@ -97,56 +97,15 @@ To bridge this gap, we propose **HyDRA**, a new paradigm based on **multi-scale 
 HyDRA adopts a **multi-scale hypergraph retrieval-augmented generation** paradigm, comprising several key stages:
 
 
-
-
-
-
-
 Stage 1: Encoding and Integration 🔄
-
-
-
-- Performs multi-granularity temporal entity encoding to capture temporal information at different scales (year, month, day)
-
-- Generates initial entity similarity scores through neural embedding learning
-
-- Integrates temporal features to handle Multi-Granular Temporal Coexistence
-
 
 
 Stage 2: Scale-Adaptive Entity Projection 📐
 
-
-
-- Executes relation alignment to identify corresponding relations across temporal knowledge graphs
-
-- Performs hypergraph decomposition to extract multi-scale representations
-
-- Adaptively projects entities across different scales to handle Heterogeneous Temporal Structures
-
-
-
 Stage 3: Multi-Scale Hypergraph Retrieval 🔍
 
 
-
-- Conducts efficient neural retrieval using FAISS for hypergraph-based similarity search
-
-- Builds multi-scale hypergraph representations for capturing complex structural dependencies
-
-- Handles Temporal Span Disparity through scale-adaptive retrieval mechanisms
-
-
-
 Stage 4: Multi-Scale Fusion 🔗
-
-
-
-- Applies multi-scale fusion to combine alignment signals from different temporal scales
-
-- Implements scale-weave synergy to coordinate information across scales
-
-- Iteratively refines alignments and updates seed entity pairs
 
 
 

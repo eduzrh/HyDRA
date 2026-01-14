@@ -78,7 +78,7 @@ To bridge this gap, we propose **HyDRA**, a new paradigm based on **multi-scale 
 |:---|:---:|:---|
 | **Multi-Granularity Temporal Encoding** | 🔄 | Captures temporal information at different scales (year, month, day) |
 | **Scale-Adaptive Entity Projection** | 📐 | Adaptive entity projection across different graph scales and dimensions |
-| **Multi-Scale Hypergraph Retrieval** | 🔍 | Efficient neural retrieval using FAISS for hypergraph-based similarity search |
+| **Multi-Scale Hypergraph Retrieval** | 🔍 | Efficient neural retrieval for hypergraph-based search |
 | **Scale-Weave Synergy** | 🔗 | Coordinates information across different temporal scales |
 | **State-of-the-Art Performance** | 📈 | Consistently outperforming 28 competitive baselines, achieving up to 43.3% improvement in Hits@1 |
 

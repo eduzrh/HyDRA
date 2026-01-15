@@ -470,7 +470,9 @@ Responses targeted within 2-3 business days.
 
 ## 📑 Citation
 
-If you find this work useful in your research, please cite:
+
+If you find this work helpful for your research or applications, we would appreciate it if you could cite the following paper:
+
 
 ```bibtex
 @article{DBLP:journals/corr/abs-2507-14475,
@@ -489,6 +491,7 @@ If you find this work useful in your research, please cite:
   eprinttype   = {arXiv},
   eprint       = {2507.14475}
 }
+```
 
 ---
 

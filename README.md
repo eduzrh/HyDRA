@@ -65,7 +65,7 @@
 
 
 
-To bridge this gap, we propose **HyDRA**, a new paradigm based on **multi-scale hypergraph retrieval-augmented generation** to systematically address the unique challenges of TKGA-Wild. HyDRA effectively captures complex structural dependencies, models multi-granular temporal features, mitigates temporal disparities, and introduces a new **scale-weave synergy mechanism** to coordinate information across different temporal scales.
+We have officially introduced complete and high-quality TKGA-Wild benchmarks and proposed **HyDRA**, a new paradigm based on **multi-scale hypergraph retrieval-augmented generation** to systematically address the unique challenges of TKGA-Wild. HyDRA effectively captures complex structural dependencies, models multi-granular temporal features, mitigates temporal disparities, and introduces a new **scale-weave synergy mechanism** to coordinate information across different temporal scales.
 
 
 

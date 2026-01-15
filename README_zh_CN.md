@@ -452,7 +452,7 @@ python HyDRA_main.py --data_dir data/icews_wiki
 
 ## 📑 引用
 
-如果本工作对您的研究或应用有所帮助，欢迎在相关成果中引用以下论文：
+如果本工作对您的研究或应用有所帮助，欢迎在相关工作中引用以下论文：
 
 ```biblatex
 @article{DBLP:journals/corr/abs-2507-14475,
@@ -528,6 +528,7 @@ python HyDRA_main.py --data_dir data/icews_wiki
 ---
 
 本仓库对应论文 ***Towards Temporal Knowledge Graph Alignment in the Wild***（投稿于 *IEEE TPAMI*），是我们先前工作 [BETA](https://github.com/DexterZeng/BETA) 的扩展。
+
 
 
 

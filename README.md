@@ -38,6 +38,7 @@
   <a href="#-reproducibility"><b>🔬 Reproducibility</b></a> |
   <a href="#-license"><b>📜 License</b></a> |
   <a href="#-contact"><b>📬 Contact</b></a>
+  <a href="#-citation"><b>📑 Citation</b></a>
 </p>
 
 
@@ -445,6 +446,12 @@ We employ standard knowledge graph alignment metrics for transparency and compar
 - **MRR (Mean Reciprocal Rank)**: Average reciprocal rank of correct alignments
 
 
+## 📜 License
+
+
+
+[MIT License](LICENSE) - Copyright notices preserved.
+
 
 ## 📬 Contact
 
@@ -460,13 +467,28 @@ Responses targeted within 2-3 business days.
 
 
 
-## 📜 License
 
+## 📑 Citation
 
+If you find this work useful in your research, please cite:
 
-[MIT License](LICENSE) - Copyright notices preserved.
-
-
+```bibtex
+@article{DBLP:journals/corr/abs-2507-14475,
+  author       = {Runhao Zhao and
+                  Weixin Zeng and
+                  Wentao Zhang and
+                  Xiang Zhao and
+                  Jiuyang Tang and
+                  Lei Chen},
+  title        = {Towards Temporal Knowledge Graph Alignment in the Wild},
+  journal      = {CoRR},
+  volume       = {abs/2507.14475},
+  year         = {2025},
+  url          = {https://doi.org/10.48550/arXiv.2507.14475},
+  doi          = {10.48550/ARXIV.2507.14475},
+  eprinttype   = {arXiv},
+  eprint       = {2507.14475}
+}
 
 ---
 

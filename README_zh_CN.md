@@ -38,6 +38,7 @@
   <a href="#-reproducibility"><b>🔬 可复现性</b></a> |
   <a href="#-license"><b>📜 许可证</b></a> |
   <a href="#-contact"><b>📬 联系方式</b></a>
+  <a href="#-citation"><b>📑 引用</b></a>
 </p>
 
 
@@ -427,6 +428,13 @@ python HyDRA_main.py --data_dir data/icews_wiki
 
 
 
+## 📜 许可证
+
+
+
+[MIT License](LICENSE) - 保留版权声明。
+
+
 ## 📬 联系方式
 
 
@@ -441,13 +449,29 @@ python HyDRA_main.py --data_dir data/icews_wiki
 
 
 
-## 📜 许可证
 
+## 📑 引用
 
+如果本工作对您的研究或应用有所帮助，欢迎在相关成果中引用以下论文：
 
-[MIT License](LICENSE) - 保留版权声明。
-
-
+```biblatex
+@article{DBLP:journals/corr/abs-2507-14475,
+  author       = {Runhao Zhao and
+                  Weixin Zeng and
+                  Wentao Zhang and
+                  Xiang Zhao and
+                  Jiuyang Tang and
+                  Lei Chen},
+  title        = {Towards Temporal Knowledge Graph Alignment in the Wild},
+  journal      = {CoRR},
+  volume       = {abs/2507.14475},
+  year         = {2025},
+  url          = {https://doi.org/10.48550/arXiv.2507.14475},
+  doi          = {10.48550/ARXIV.2507.14475},
+  eprinttype   = {arXiv},
+  eprint       = {2507.14475}
+}
+```
 
 ---
 
@@ -504,6 +528,7 @@ python HyDRA_main.py --data_dir data/icews_wiki
 ---
 
 本仓库对应论文 ***Towards Temporal Knowledge Graph Alignment in the Wild***（投稿于 *IEEE TPAMI*），是我们先前工作 [BETA](https://github.com/DexterZeng/BETA) 的扩展。
+
 
 
 

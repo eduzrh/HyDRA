@@ -247,7 +247,7 @@ cd HyDRA
 
 ```bash
 
-python HyDRA_main.py --data_dir data/icews_wiki
+python HyDRA_main.py --data_dir data/WildBETA
 
 ```
 
@@ -279,7 +279,7 @@ python HyDRA_main.py --data_dir data/icews_wiki
 
 ```bash
 
-python HyDRA_main.py --data_dir data/icews_wiki
+python HyDRA_main.py --data_dir data/WildBETA
 
 ```
 
@@ -295,7 +295,7 @@ python HyDRA_main.py --data_dir data/icews_wiki
 
 ```bash
 
-python HyDRA_main.py --data_dir data/icews_wiki \
+python HyDRA_main.py --data_dir data/WildBETA \
     --cuda 0 \
     --epochs 1500 \
     --max_iterations 5 \
@@ -312,8 +312,6 @@ python HyDRA_main.py --data_dir data/icews_wiki \
 | 参数 | 类型 | 默认值 | 描述 |
 |:---|:---:|:---:|:---|
 | `--data_dir` | str | **必需** | 数据集目录路径 |
-| `--skip_s4` | flag | False | 跳过编码阶段（如果结果已存在） |
-| `--only_s4` | flag | False | 仅运行编码阶段 |
 | `--cuda` | int | 0 | 用于训练的 CUDA 设备 ID |
 | `--epochs` | int | 500 | 编码阶段的训练轮数 |
 | `--max_iterations` | int | 3 | 最大流程迭代次数 |
@@ -367,7 +365,7 @@ HyDRA 支持多粒度时序建模（年和月级别）以处理多粒度时序�
 
 ```bash
 
-python HyDRA_main.py --data_dir data/icews_wiki
+python HyDRA_main.py --data_dir data/WildBETA
 
 ```
 

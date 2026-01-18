@@ -1,60 +1,36 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-HyDRA Main Pipeline Script
+HyDRA: Main Pipeline Script
 
-Features: Orchestrates the entire HyDRA pipeline, including:
-1. S4 Training (Simple-HHEA)
-2. Relation Alignment + Hypergraph Decomposition + Neural Retrieval + Multi-Scale Representation
-3. Multi-Scale Fusion + Add to sup_pairs
+Stages:
+1. Encoding and Integration
+2. Scale-Adaptive Entity Projection
+3. Multi-Scale Fusion
 
 Usage:
-    python HyDRA_main.py --data_dir data/icews_wiki [options]
+    python HyDRA_main.py --data_dir <dataset_name_or_path> [options]
 
-Examples:
-    # Run complete pipeline
-    python HyDRA_main.py --data_dir data/icews_wiki
-
-    # Skip S4 training (if results already exist)
-    python HyDRA_main.py --data_dir data/icews_wiki --skip_s4
-
-    # Only run S4 training
-    python HyDRA_main.py --data_dir data/icews_wiki --only_s4
-
-    # Only run retrieval and fusion (skip S4)
-    python HyDRA_main.py --data_dir data/icews_wiki --skip_s4
+Supported datasets:
+    WildBETA, BETA, icews_wiki, icews_yago, YAGO-WIKI50K-1K,
+    DICEWS-200, en_fr, DBP-WIKI, DOREMUS, AGROLD
 """
 
 import os
 import sys
 import argparse
 import subprocess
+from ablation_config import AblationConfig
 
 
 def check_s4_output(data_dir):
-    """
-    Check if S4 output file exists
-    
-    Args:
-        data_dir: Data directory path
-        
-    Returns:
-        bool: Whether S4 output file exists
-    """
+    """Check if Encoding and Integration output file exists."""
     s4_output_file = os.path.join(data_dir, 'message_pool', 'integration_top_pair.txt')
     return os.path.exists(s4_output_file) and os.path.getsize(s4_output_file) > 0
 
 
 def count_unique_kg1_entities(data_dir):
-    """
-    Count unique KG1 entities in integration_top_pair.txt
-    
-    Args:
-        data_dir: Data directory path
-        
-    Returns:
-        int: Number of unique KG1 entities, returns 0 if file does not exist
-    """
+    """Count unique KG1 entities in integration_top_pair.txt."""
     s4_output_file = os.path.join(data_dir, 'message_pool', 'integration_top_pair.txt')
     
     if not os.path.exists(s4_output_file):
@@ -75,39 +51,28 @@ def count_unique_kg1_entities(data_dir):
                     except ValueError:
                         continue
     except Exception as e:
-        print(f"Warning: Error reading S4 output file: {e}")
+        print(f"Warning: Error reading encoding and integration output file: {e}")
         return 0
     
     return len(kg1_entities)
 
 
 def ensure_ent_ids_1_restored(data_dir):
-    """
-    Ensure ent_ids_1 file is restored (if it was temporarily replaced)
-    
-    Args:
-        data_dir: Data directory path
-        
-    Returns:
-        bool: Whether the file is in correct state
-    """
+    """Ensure ent_ids_1 file is restored if it was temporarily replaced."""
     ent_ids_1_path = os.path.join(data_dir, "ent_ids_1")
     backup_path = os.path.join(data_dir, "ent_ids_1.backup")
     
-    # If backup file exists, ent_ids_1 may have been replaced and needs to be restored
     if os.path.exists(backup_path):
         import shutil
         print(f"  Warning: Found backup file, restoring ent_ids_1 from backup...")
         shutil.move(backup_path, ent_ids_1_path)
         print(f"  Restored ent_ids_1 from backup")
     
-    # Check if ent_ids_1 file is normal (should have reasonable number of lines, e.g., >1000)
     if os.path.exists(ent_ids_1_path):
         with open(ent_ids_1_path, 'r', encoding='utf-8') as f:
             line_count = sum(1 for line in f if line.strip())
             if line_count < 1000:
                 print(f"  Warning: ent_ids_1 has only {line_count} lines, which seems too small")
-                print(f"  This might cause IndexError in S4 training")
                 return False
         return True
     else:
@@ -115,29 +80,27 @@ def ensure_ent_ids_1_restored(data_dir):
         return False
 
 
-def run_s4_training(data_dir, cuda=0, epochs=500):
-    """
-    Run S4 training (Simple-HHEA)
-    
-    Args:
-        data_dir: Data directory path
-        cuda: CUDA device ID
-        epochs: Number of training epochs
-        
-    Returns:
-        bool: Whether successful
-    """
+def run_s4_training(data_dir, cuda=0, epochs=500, skip_encoding_integration=False, multi_granularity_time=False, ablation_config=None):
+    """Run Stage 1: Encoding and Integration."""
     print("\n" + "=" * 80)
-    print("Step 1: Running S4 Training (Simple-HHEA)")
+    print("Stage 1: Encoding and Integration")
     print("=" * 80 + "\n")
     
-    # Ensure ent_ids_1 file is correctly restored (if it was temporarily replaced)
-    print("Checking ent_ids_1 file before S4 training...")
+    if skip_encoding_integration:
+        print("  [SKIP] encoding_and_integration step is skipped")
+        s4_output_file = os.path.join(data_dir, 'message_pool', 'integration_top_pair.txt')
+        if os.path.exists(s4_output_file) and os.path.getsize(s4_output_file) > 0:
+            print(f"  ✓ Encoding and Integration output file already exists")
+            return True
+        else:
+            print(f"  ⚠ Warning: Encoding and Integration output file not found")
+            return True
+    
+    print("Checking ent_ids_1 file before encoding and integration...")
     if not ensure_ent_ids_1_restored(data_dir):
-        print("  Error: ent_ids_1 file is not in correct state. Please check the file manually.")
+        print("  Error: ent_ids_1 file is not in correct state.")
         return False
     
-    # Check if run_s4_standalone.py exists
     s4_script = os.path.join(os.path.dirname(__file__), 'encoding_and_integration', 'run_s4_standalone.py')
     
     if os.path.exists(s4_script):
@@ -149,36 +112,35 @@ def run_s4_training(data_dir, cuda=0, epochs=500):
                 '--cuda', str(cuda),
                 '--epochs', str(epochs)
             ]
+            
+            if ablation_config is None:
+                use_multi_gran = multi_granularity_time
+            else:
+                use_multi_gran = multi_granularity_time and ablation_config.use_multi_granular_temporal_encoder
+            
+            if use_multi_gran:
+                cmd.append('--multi_granularity_time')
+            
             print(f"Running command: {' '.join(cmd)}")
             result = subprocess.run(cmd, check=True, capture_output=False)
             return result.returncode == 0
         except subprocess.CalledProcessError as e:
-            print(f"Error running S4 training: {e}")
+            print(f"Error running Encoding and Integration: {e}")
             return False
     else:
-        print(f"Warning: {s4_script} not found. Please run S4 training manually.")
-        print(f"Expected output: {os.path.join(data_dir, 'message_pool', 'integration_top_pair.txt')}")
+        print(f"Warning: {s4_script} not found.")
         return False
 
 
-def run_s4_to_retrieval(data_dir, iteration=1):
-    """
-    Run S4 to Retrieval pipeline (Relation Alignment + Hypergraph Decomposition + Retrieval + Multi-Scale Representation)
-    
-    Args:
-        data_dir: Data directory path
-        iteration: Current iteration number (default: 1)
-        
-    Returns:
-        bool: Whether successful
-    """
+def run_s4_to_retrieval(data_dir, iteration=1, ablation_config=None):
+    """Run Stage 2: Scale-Adaptive Entity Projection."""
     print("\n" + "=" * 80)
-    print("Step 2: Running S4 to Retrieval (Relation Alignment + Hypergraph Decomposition + Retrieval + Multi-Scale Representation)")
+    print("Stage 2: Scale-Adaptive Entity Projection")
     print("=" * 80 + "\n")
     
     try:
         from scale_adaptive_entity_projection.entity_projection import s4_to_retrieval
-        success = s4_to_retrieval(data_dir, iteration=iteration)
+        success = s4_to_retrieval(data_dir, iteration=iteration, ablation_config=ablation_config)
         return success
     except ImportError as e:
         print(f"Error importing s4_to_retrieval: {e}")
@@ -190,23 +152,15 @@ def run_s4_to_retrieval(data_dir, iteration=1):
         return False
 
 
-def run_multi_scale_fusion(data_dir):
-    """
-    Run multi-scale fusion (including automatic addition to sup_pairs)
-    
-    Args:
-        data_dir: Data directory path
-        
-    Returns:
-        bool: Whether successful
-    """
+def run_multi_scale_fusion(data_dir, ablation_config=None):
+    """Run Stage 4: Multi-Scale Fusion."""
     print("\n" + "=" * 80)
-    print("Step 3: Running Multi-Scale Fusion (with automatic sup_pairs update)")
+    print("Stage 4: Multi-Scale Fusion")
     print("=" * 80 + "\n")
     
     try:
         from multi_scale_fusion.multi_scale_fusion import multi_scale_fusion
-        aligned_pairs = multi_scale_fusion(data_dir)
+        aligned_pairs = multi_scale_fusion(data_dir, ablation_config=ablation_config)
         return aligned_pairs is not None and len(aligned_pairs) > 0
     except ImportError as e:
         print(f"Error importing multi_scale_fusion: {e}")
@@ -218,66 +172,49 @@ def run_multi_scale_fusion(data_dir):
         return False
 
 
-def run_full_pipeline(data_dir, skip_s4=False, only_s4=False, cuda=0, epochs=500, max_iterations=3, min_kg1_entities=50):
-    """
-    Run complete HyDRA pipeline (supports iterative loops)
+def run_full_pipeline(data_dir, skip_s4=False, only_s4=False, cuda=0, epochs=500, max_iterations=3, min_kg1_entities=50, skip_encoding_integration=False, multi_granularity_time=False, ablation_config=None):
+    """Run the complete HyDRA pipeline with iteration control and ablation support."""
+    if ablation_config is None:
+        ablation_config = AblationConfig()
     
-    Args:
-        data_dir: Data directory path
-        skip_s4: Whether to skip S4 training
-        only_s4: Whether to only run S4 training
-        cuda: CUDA device ID (for S4 training)
-        epochs: Number of training epochs (for S4 training)
-        max_iterations: Maximum number of iterations (default: 3)
-        min_kg1_entities: Minimum KG1 entity count threshold (default: 50)
-        
-    Returns:
-        bool: Whether successful
-    """
     print("\n" + "=" * 80)
-    print("HyDRA: Complete Pipeline (with iteration control)")
+    print("HyDRA: Complete Pipeline")
     print("=" * 80)
     print(f"Data directory: {data_dir}")
-    print(f"Skip S4: {skip_s4}")
-    print(f"Only S4: {only_s4}")
     print(f"Max iterations: {max_iterations}")
     print(f"Min KG1 entities threshold: {min_kg1_entities}")
+    print(f"Ablation Config: {ablation_config.get_description()}")
     print("=" * 80 + "\n")
     
-    # Check data directory
     if not os.path.exists(data_dir):
         print(f"Error: Data directory not found: {data_dir}")
         return False
     
-    # If only running S4, do not loop
     if only_s4:
         success_steps = []
-        
         if not skip_s4:
             if check_s4_output(data_dir):
-                print("✓ S4 output file already exists, skipping S4 training")
-                print(f"  File: {os.path.join(data_dir, 'message_pool', 'integration_top_pair.txt')}")
-                success_steps.append("S4 (already exists)")
+                print("✓ Encoding and Integration output file already exists")
+                success_steps.append("Encoding and Integration (already exists)")
             else:
-                if run_s4_training(data_dir, cuda=cuda, epochs=epochs):
-                    success_steps.append("S4 Training")
+                if run_s4_training(data_dir, cuda=cuda, epochs=epochs, skip_encoding_integration=skip_encoding_integration, multi_granularity_time=multi_granularity_time, ablation_config=ablation_config):
+                    success_steps.append("Encoding and Integration")
                 else:
-                    print("✗ S4 training failed")
+                    print("✗ Encoding and Integration failed")
                     return False
         else:
             if not check_s4_output(data_dir):
-                print("✗ Error: S4 output file not found and --skip_s4 is set")
+                print("✗ Error: Encoding and Integration output file not found")
                 return False
             else:
-                print("✓ S4 output file exists, skipping S4 training")
-                success_steps.append("S4 (skipped)")
+                print("✓ Encoding and Integration output file exists")
+                success_steps.append("Encoding and Integration (skipped)")
         
         print("\n" + "=" * 80)
-        print("✓ Only S4 training completed")
+        print("✓ Stage 1: Encoding and Integration completed")
         print("=" * 80 + "\n")
         return True
     
-    # Iterative loop
     iteration = 0
     all_success_steps = []
     
@@ -289,73 +226,58 @@ def run_full_pipeline(data_dir, skip_s4=False, only_s4=False, cuda=0, epochs=500
         
         success_steps = []
         
-        # Step 1: S4 Training
-        if not skip_s4:
-            if check_s4_output(data_dir) and iteration > 1:
-                print("✓ S4 output file already exists from previous iteration")
-                print(f"  File: {os.path.join(data_dir, 'message_pool', 'integration_top_pair.txt')}")
-                success_steps.append("S4 (already exists)")
-            else:
-                if run_s4_training(data_dir, cuda=cuda, epochs=epochs):
-                    success_steps.append("S4 Training")
-                else:
-                    print("✗ S4 training failed")
-                    if iteration == 1:
-                        return False
-                    # If not the first iteration, continue with existing results
-                    print("  Continuing with existing files...")
-        else:
+        if skip_s4 and iteration == 1:
             if not check_s4_output(data_dir):
-                print("✗ Error: S4 output file not found and --skip_s4 is set")
+                print("✗ Error: Encoding and Integration output file not found")
+                return False
+            else:
+                print("✓ Encoding and Integration output file exists, skipping (iteration 1 only)")
+                success_steps.append("Encoding and Integration (skipped in iteration 1)")
+        else:
+            if iteration > 1:
+                print(f"  Re-running Encoding and Integration for iteration {iteration}...")
+            if run_s4_training(data_dir, cuda=cuda, epochs=epochs, skip_encoding_integration=skip_encoding_integration, multi_granularity_time=multi_granularity_time):
+                success_steps.append("Encoding and Integration")
+            else:
+                print("✗ Encoding and Integration failed")
                 if iteration == 1:
                     return False
                 print("  Continuing with existing files...")
-            else:
-                print("✓ S4 output file exists, skipping S4 training")
-                success_steps.append("S4 (skipped)")
         
-        # Check KG1 entity count in S4 output (before preparing next step)
         kg1_count = count_unique_kg1_entities(data_dir)
-        print(f"\nUnique KG1 entities in S4 output: {kg1_count}")
+        print(f"\nUnique KG1 entities: {kg1_count}")
         
-        # Stopping condition 1: KG1 entity count is less than threshold
         if kg1_count < min_kg1_entities:
             print(f"\n{'=' * 80}")
-            print(f"Stopping condition met: KG1 entities ({kg1_count}) < threshold ({min_kg1_entities})")
+            print(f"Stopping: KG1 entities ({kg1_count}) < threshold ({min_kg1_entities})")
             print(f"{'=' * 80}\n")
             all_success_steps.extend(success_steps)
             break
         
-        # Step 2: S4 to Retrieval
-        if run_s4_to_retrieval(data_dir, iteration=iteration):
-            success_steps.append("S4 to Retrieval")
+        if run_s4_to_retrieval(data_dir, iteration=iteration, ablation_config=ablation_config):
+            success_steps.append("Scale-Adaptive Entity Projection")
         else:
-            print("✗ S4 to Retrieval failed")
+            print("✗ Scale-Adaptive Entity Projection failed")
             if iteration == 1:
                 return False
-            # Continue to next iteration
             continue
         
-        # Step 3: Multi-Scale Fusion
-        if run_multi_scale_fusion(data_dir):
+        if run_multi_scale_fusion(data_dir, ablation_config=ablation_config):
             success_steps.append("Multi-Scale Fusion")
         else:
             print("✗ Multi-Scale Fusion failed")
             if iteration == 1:
                 return False
-            # Continue to next iteration
             continue
         
         all_success_steps.extend(success_steps)
         
-        # Check if maximum iterations reached
         if iteration >= max_iterations:
             print(f"\n{'=' * 80}")
             print(f"Reached maximum iterations: {max_iterations}")
             print(f"{'=' * 80}\n")
             break
     
-    # Summary
     print("\n" + "=" * 80)
     print("HyDRA Pipeline Summary")
     print("=" * 80)
@@ -367,36 +289,51 @@ def run_full_pipeline(data_dir, skip_s4=False, only_s4=False, cuda=0, epochs=500
     return True
 
 
+def normalize_data_dir(data_dir):
+    """Normalize data directory path: convert dataset name to data/{name} if needed."""
+    supported_datasets = [
+        'WildBETA', 'BETA', 'icews_wiki', 'icews_yago', 'YAGO-WIKI50K-1K',
+        'DICEWS-200', 'en_fr', 'DBP-WIKI', 'DOREMUS', 'AGROLD'
+    ]
+    
+    if os.path.isabs(data_dir):
+        return data_dir
+    
+    if os.sep in data_dir or '/' in data_dir:
+        return data_dir
+    
+    if data_dir in supported_datasets:
+        return f"data/{data_dir}"
+    
+    return f"data/{data_dir}"
+
+
 def main():
-    """Main function"""
+    supported_datasets = [
+        'WildBETA', 'BETA', 'icews_wiki', 'icews_yago', 'YAGO-WIKI50K-1K',
+        'DICEWS-200', 'en_fr', 'DBP-WIKI', 'DOREMUS', 'AGROLD'
+    ]
+    
     parser = argparse.ArgumentParser(
         description="HyDRA: Complete Pipeline",
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""
-Complete pipeline includes (supports iterative loops):
-  1. S4 Training (Simple-HHEA)
-  2. Relation Alignment + Hypergraph Decomposition + Neural Retrieval + Multi-Scale Representation
-  3. Multi-Scale Fusion + Automatic addition to sup_pairs
+        epilog=f"""
+Pipeline stages (with iterative refinement):
+  1. Encoding and Integration
+  2. Scale-Adaptive Entity Projection
+  3. Multi-Scale Fusion
 
 Stopping conditions:
-  - If unique KG1 entity count in S4 output < min_kg1_entities (default 50), stop loop
-  - If iteration count >= max_iterations (default 3), stop loop
+  - KG1 entities < min_kg1_entities (default: 50)
+  - Iterations >= max_iterations (default: 3)
 
-Example usage:
-  # Run complete pipeline (max 3 iterations)
-  python HyDRA_main.py --data_dir data/icews_wiki
+Supported datasets: {', '.join(supported_datasets)}
 
-  # Skip S4 training (if results already exist)
-  python HyDRA_main.py --data_dir data/icews_wiki --skip_s4
-
-  # Only run S4 training
-  python HyDRA_main.py --data_dir data/icews_wiki --only_s4
-
-  # Specify maximum iterations and minimum entity count threshold
-  python HyDRA_main.py --data_dir data/icews_wiki --max_iterations 5 --min_kg1_entities 100
-
-  # Specify CUDA device and training epochs
-  python HyDRA_main.py --data_dir data/icews_wiki --cuda 0 --epochs 500
+Examples:
+  python HyDRA_main.py --data_dir icews_wiki
+  python HyDRA_main.py --data_dir icews_wiki --skip_s4
+  python HyDRA_main.py --data_dir icews_wiki --only_s4
+  python HyDRA_main.py --data_dir icews_wiki --max_iterations 5 --min_kg1_entities 100
         """
     )
     
@@ -404,65 +341,201 @@ Example usage:
         "--data_dir",
         type=str,
         required=True,
-        help="Data directory path (e.g., data/icews_wiki)"
+        help=f"Data directory path or dataset name. Supported: {', '.join(supported_datasets)}"
     )
     
     parser.add_argument(
         "--skip_s4",
         action="store_true",
-        help="Skip S4 training step (if integration_top_pair.txt already exists)"
+        help="Skip Stage 1: Encoding and Integration"
     )
     
     parser.add_argument(
         "--only_s4",
         action="store_true",
-        help="Only run S4 training step"
+        help="Run only Stage 1: Encoding and Integration"
     )
     
     parser.add_argument(
         "--cuda",
         type=int,
         default=0,
-        help="CUDA device ID (for S4 training, default: 0)"
+        help="CUDA device ID (default: 0)"
     )
     
     parser.add_argument(
         "--epochs",
         type=int,
         default=500,
-        help="S4 training epochs (default: 500)"
+        help="Training epochs for Encoding and Integration (default: 500)"
     )
     
     parser.add_argument(
         "--max_iterations",
         type=int,
         default=3,
-        help="Maximum number of iterations (default: 3)"
+        help="Maximum iterations (default: 3)"
     )
     
     parser.add_argument(
         "--min_kg1_entities",
         type=int,
         default=50,
-        help="Minimum KG1 entity count threshold (default: 50, loop stops if below this value)"
+        help="Minimum KG1 entities threshold (default: 50)"
+    )
+    
+    parser.add_argument(
+        "--skip_encoding_integration",
+        action="store_true",
+        help="Skip encoding_and_integration step (for testing)"
+    )
+    
+    parser.add_argument(
+        "--multi_granularity_time",
+        action="store_true",
+        help="Enable multi-granularity temporal modeling (default: False)"
+    )
+    
+    ablation_group = parser.add_argument_group('Ablation Experiments', 'Ablation options for component evaluation')
+    
+    ablation_group.add_argument(
+        "--w/oMulti-GranularTemporalEncoder",
+        dest="wo_multi_granular_temporal_encoder",
+        action="store_true",
+        help="Ablation: Remove multi-granular temporal encoder"
+    )
+    ablation_group.add_argument(
+        "--w/oYearGranularity",
+        dest="wo_year_granularity",
+        action="store_true",
+        help="Ablation: Remove year granularity"
+    )
+    ablation_group.add_argument(
+        "--w/oDateGranularity",
+        dest="wo_date_granularity",
+        action="store_true",
+        help="Ablation: Remove date granularity"
+    )
+    ablation_group.add_argument(
+        "--w/oScale-AdaptiveEntityProjection",
+        dest="wo_scale_adaptive_entity_projection",
+        action="store_true",
+        help="Ablation: Remove scale-adaptive entity projection"
+    )
+    ablation_group.add_argument(
+        "--w/oAdaptiveTimeProjection",
+        dest="wo_adaptive_time_projection",
+        action="store_true",
+        help="Ablation: Remove adaptive time projection"
+    )
+    ablation_group.add_argument(
+        "--w/oAdaptiveRelationProjection",
+        dest="wo_adaptive_relation_projection",
+        action="store_true",
+        help="Ablation: Remove adaptive relation projection"
+    )
+    ablation_group.add_argument(
+        "--w/oMulti-ScaleHypergraphRetrieval",
+        dest="wo_multi_scale_hypergraph_retrieval",
+        action="store_true",
+        help="Ablation: Remove multi-scale hypergraph retrieval"
+    )
+    ablation_group.add_argument(
+        "--w/oMulti-ScaleHypergraph",
+        dest="wo_multi_scale_hypergraph",
+        action="store_true",
+        help="Ablation: Remove multi-scale hypergraph (use single scale L1 only)"
+    )
+    ablation_group.add_argument(
+        "--w/oMulti-ScaleInteraction-AugmentedFusion",
+        dest="wo_multi_scale_interaction_augmented_fusion",
+        action="store_true",
+        help="Ablation: Remove multi-scale interaction-augmented fusion"
+    )
+    ablation_group.add_argument(
+        "--w/oIntra-ScaleInteraction",
+        dest="wo_intra_scale_interaction",
+        action="store_true",
+        help="Ablation: Remove intra-scale interaction"
+    )
+    ablation_group.add_argument(
+        "--w/oMulti-ScaleFusionReasoning",
+        dest="wo_multi_scale_fusion_reasoning",
+        action="store_true",
+        help="Ablation: Remove multi-scale fusion reasoning"
+    )
+    ablation_group.add_argument(
+        "--w/oConflictDetection",
+        dest="wo_conflict_detection",
+        action="store_true",
+        help="Ablation: Remove conflict detection"
     )
     
     args = parser.parse_args()
     
-    # Check for parameter conflicts
+    ablation_config = AblationConfig()
+    ablation_applied = False
+    
+    if getattr(args, 'wo_multi_granular_temporal_encoder', False):
+        ablation_config.apply_ablation('w/oMulti-GranularTemporalEncoder')
+        ablation_applied = True
+    if getattr(args, 'wo_year_granularity', False):
+        ablation_config.apply_ablation('w/oYearGranularity')
+        ablation_applied = True
+    if getattr(args, 'wo_date_granularity', False):
+        ablation_config.apply_ablation('w/oDateGranularity')
+        ablation_applied = True
+    if getattr(args, 'wo_scale_adaptive_entity_projection', False):
+        ablation_config.apply_ablation('w/oScale-AdaptiveEntityProjection')
+        ablation_applied = True
+    if getattr(args, 'wo_adaptive_time_projection', False):
+        ablation_config.apply_ablation('w/oAdaptiveTimeProjection')
+        ablation_applied = True
+    if getattr(args, 'wo_adaptive_relation_projection', False):
+        ablation_config.apply_ablation('w/oAdaptiveRelationProjection')
+        ablation_applied = True
+    if getattr(args, 'wo_multi_scale_hypergraph_retrieval', False):
+        ablation_config.apply_ablation('w/oMulti-ScaleHypergraphRetrieval')
+        ablation_applied = True
+    if getattr(args, 'wo_multi_scale_hypergraph', False):
+        ablation_config.apply_ablation('w/oMulti-ScaleHypergraph')
+        ablation_applied = True
+    if getattr(args, 'wo_multi_scale_interaction_augmented_fusion', False):
+        ablation_config.apply_ablation('w/oMulti-ScaleInteraction-AugmentedFusion')
+        ablation_applied = True
+    if getattr(args, 'wo_intra_scale_interaction', False):
+        ablation_config.apply_ablation('w/oIntra-ScaleInteraction')
+        ablation_applied = True
+    if getattr(args, 'wo_multi_scale_fusion_reasoning', False):
+        ablation_config.apply_ablation('w/oMulti-ScaleFusionReasoning')
+        ablation_applied = True
+    if getattr(args, 'wo_conflict_detection', False):
+        ablation_config.apply_ablation('w/oConflictDetection')
+        ablation_applied = True
+    
+    if not ablation_applied:
+        ablation_config = None
+    
     if args.skip_s4 and args.only_s4:
         print("Error: --skip_s4 and --only_s4 cannot be used together")
         sys.exit(1)
     
-    # Run complete pipeline
+    data_dir = normalize_data_dir(args.data_dir)
+    
+    if data_dir != args.data_dir:
+        print(f"Dataset name '{args.data_dir}' converted to path: {data_dir}")
+    
     success = run_full_pipeline(
-        data_dir=args.data_dir,
+        data_dir=data_dir,
         skip_s4=args.skip_s4,
         only_s4=args.only_s4,
         cuda=args.cuda,
         epochs=args.epochs,
         max_iterations=args.max_iterations,
-        min_kg1_entities=args.min_kg1_entities
+        min_kg1_entities=args.min_kg1_entities,
+        skip_encoding_integration=args.skip_encoding_integration,
+        multi_granularity_time=args.multi_granularity_time,
+        ablation_config=ablation_config
     )
     
     if success:
@@ -475,4 +548,3 @@ Example usage:
 
 if __name__ == "__main__":
     main()
-

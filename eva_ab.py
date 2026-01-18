@@ -37,9 +37,9 @@ def calculate_abs_hits_at_1(ref_path: str, pred_path: str) -> float:
         print(f"File Read Error:{e}")
         return 0.0
 
-# Usage example
+# Example usage
 if __name__ == "__main__":
-    ref_path = '/home/dex/Desktop/entity_sy/HyDRA/data/icews_yago/ref_pairs'
-    pred_path = '/home/dex/Desktop/entity_sy/HyDRA/data/icews_yago/message_pool/retriever_outputs.txt'
+    ref_path = '/home/dex/Desktop/entity_sy/Hydra/data/icews_yago/ref_pairs'
+    pred_path = '/home/dex/Desktop/entity_sy/Hydra/data/icews_yago/message_pool/retriever_outputs.txt'
 
     hits = calculate_abs_hits_at_1(ref_path, pred_path)

@@ -137,13 +137,13 @@ def load_ents(path):
     return data
 
 
-def retrieve_top_k_entities(query, retriever, k=10):
+def retrieve_top_k_entities(query, retriever, k=5):
     """
     Use FAISS to retrieve TOP-K entities for given query
     Args:
         query: Query entity name
         retriever: Retriever instance for searching
-        k: Number of candidate entities to return
+        k: Number of candidate entities to return (default: 5, reduced from 10)
     Returns:
         top_k_answers: TOP-K most relevant entities
     """
@@ -180,7 +180,7 @@ def setup_retriever(api_base, api_key, retriever_document_path, faiss_index_path
     db = FAISS.load_local(faiss_index_path, embeddings, allow_dangerous_deserialization=True)
     retriever = db.as_retriever(
         search_type="mmr",
-        search_kwargs={"k": 5, "fetch_k": 10}
+        search_kwargs={"k": 5, "fetch_k": 5}  # Reduced from fetch_k=10 to 5
     )
     # retriever = db.as_retriever(search_type="similarity_score_threshold",
     #                             search_kwargs={"score_threshold": 0.5})
@@ -218,9 +218,8 @@ def process_entity_batch(batch, top_k=5):
     return outputs
 
 
-def prepare_faiss_index(retriever_document_path, faiss_index_path, api_base=None, api_key=None, force_rebuild=False):
-    """
-    Prepare FAISS index if it doesn't exist
+def prepare_faiss_index(retriever_document_path, faiss_index_path, api_base=None, api_key=None, force_rebuild=False, max_entities=None, filter_aspects=True):
+    """Prepare FAISS index if it doesn't exist
     
     Args:
         retriever_document_path: Path to the retriever document
@@ -241,6 +240,36 @@ def prepare_faiss_index(retriever_document_path, faiss_index_path, api_base=None
     # Load documents
     loader = TextLoader(retriever_document_path)
     raw_documents = loader.load()
+    
+    # Filter documents if needed
+    if filter_aspects or max_entities:
+        filtered_documents = []
+        for doc in raw_documents:
+            content = doc.page_content.strip()
+            if not content:
+                continue
+            parts = content.split("\t")
+            if len(parts) < 1:
+                continue
+            try:
+                entity_id = int(parts[0])
+                # Filter out aspect entities (ID >= 1000000)
+                if filter_aspects and entity_id >= 1000000:
+                    continue
+                filtered_documents.append(doc)
+            except ValueError:
+                continue
+        
+        # Limit to max_entities if specified
+        if max_entities and len(filtered_documents) > max_entities:
+            import random
+            random.seed(42)
+            filtered_documents = random.sample(filtered_documents, max_entities)
+            print(f"  Filtered to {max_entities} entities (random sampling)")
+        
+        if filter_aspects:
+            print(f"  Filtered out aspect entities, {len(filtered_documents)}/{len(raw_documents)} entities remaining")
+        raw_documents = filtered_documents
 
     # Initialize OpenAI embedding model with API config
     if api_base and api_key:
@@ -319,7 +348,7 @@ def process_entities_parallel(config):
     print(f"Parallel Retriever Execution time: {end_time - start_time:.2f} seconds")
 
 
-def neural_retrieval(data_dir, force_rebuild_index=False):
+def neural_retrieval(data_dir, force_rebuild_index=False, max_entities=None, filter_aspects=True, max_aspects_per_entity=None, deduplicate=False):
     """
     Neural Retrieval - First phase of Adaptive Decoupling
     Corresponds to paper Section III-B-1:
@@ -329,6 +358,10 @@ def neural_retrieval(data_dir, force_rebuild_index=False):
     Args:
         data_dir: Base directory containing entity files
         force_rebuild_index: If True, force rebuild FAISS index even if it exists (default: False)
+        max_entities: Maximum number of entities (optional, for compatibility)
+        filter_aspects: Whether to filter aspect entities (optional, for compatibility)
+        max_aspects_per_entity: Maximum aspects per entity (optional, for compatibility)
+        deduplicate: Whether to remove duplicates (optional, for compatibility)
     """
 
 
@@ -337,12 +370,9 @@ def neural_retrieval(data_dir, force_rebuild_index=False):
     }
     config_top_k = 5
 
-    # API credentials should be configured via environment variables or config file
-    # Example: api_base = os.getenv("OPENAI_API_BASE", "https://api.openai.com/v1")
-    #          api_key = os.getenv("OPENAI_API_KEY")
     config = {
-        'api_base': os.getenv("OPENAI_API_BASE", ""),  # TODO: Configure API base URL
-        'api_key': os.getenv("OPENAI_API_KEY", ""),  # TODO: Configure API key
+        'api_base': 'xxx',
+        'api_key': 'xxx',
         'retriever_document_path': data_dir + "/inrag_ent_ids_2_pre_embeding.txt",
         'faiss_index': data_dir + "/index/faiss_index",
         'retriever_output_file': S1_PRIVATE_MESSAGE_POOL['top_k_candidate_entities'],
@@ -366,5 +396,5 @@ def neural_retrieval(data_dir, force_rebuild_index=False):
 
 
 if __name__ == "__main__":
-    data_dir = "/home/dex/Desktop/entity_sy/AdaCoAgent_backup/data/icews_yago/"
+    data_dir = "/home/dex/Desktop/entity_sy/Hydra/data/icews_yago/"
     neural_retrieval(data_dir)

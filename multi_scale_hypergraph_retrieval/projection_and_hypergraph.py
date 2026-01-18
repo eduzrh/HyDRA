@@ -75,7 +75,7 @@ class AdaptiveEvolutionProjection:
                 if len(parts) == 2:
                     kg1_id, kg2_id = int(parts[0]), int(parts[1])
                     self.pre_alignment_pairs.append((kg1_id, kg2_id))
-        logger.info(f"Loaded pre-alignment entity pairs: {len(self.pre_alignment_pairs)} pairs")
+        logger.info(f"Loaded pre-alignment entity pairs: {len(self.pre_alignment_pairs)}")
 
     def _load_modality_attributes(self):
         """Load modality attributes"""
@@ -363,8 +363,8 @@ def get_hypergraph_statistics(self, output_dir: str) -> Dict:
 
 if __name__ == "__main__":
     # Configure paths
-    DATA_DIR = "/home/dex/Desktop/entity_sy/HyDRA/data/icews_wiki"          # Input data directory
-    OUTPUT_DIR = "/home/dex/Desktop/entity_sy/HyDRA/data/icews_wiki/message_pool"  # Output directory
+    DATA_DIR = "/home/dex/Desktop/entity_sy/Hydra/data/icews_wiki"          # Input data directory
+    OUTPUT_DIR = "/home/dex/Desktop/entity_sy/Hydra/data/icews_wiki/message_pool"  # Output directory
 
     # Create processor instance
     processor = AdaptiveEvolutionProjection(DATA_DIR, OUTPUT_DIR)

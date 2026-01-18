@@ -3,16 +3,16 @@
 """
 Hypergraph Decomposition Module
 
-Features:
-1. Decompose entity pairs from S4's top-k output into multiple aspects of KG2 entities
+Functionality:
+1. Decompose KG2 entities into multiple aspects from top-k entity pairs output by Stage 1
 2. Two decomposition methods:
    - Temporal projection: Based on common time intervals of entity pairs, form temporal aspect KG2 entities
    - Relational projection: Based on common relations + tail entities, form relational aspect KG2 entities
 3. Generate aspect entities for retrieval and maintain mapping from aspects to original entities
 
-References:
+Reference:
 - Projection hypergraph construction module in the paper
-- Multi-modal decomposition approach in MTKGA-Wild
+- Multi-modal decomposition ideas from MTKGA-Wild
 """
 
 import os
@@ -28,14 +28,14 @@ class HypergraphDecomposition:
     """
     Hypergraph Decomposition Class
     
-    Decomposes entity pairs into multiple aspects of KG2 entities:
+    Decompose entity pairs into multiple aspects of KG2 entities:
     1. Temporal aspects: Based on common time intervals
     2. Relational aspects: Based on common relations + tail entities
     """
     
     def __init__(self, data_dir: str, output_dir: str = None):
         """
-        Initialize
+        Initialize.
         
         Args:
             data_dir: Data directory path
@@ -45,7 +45,7 @@ class HypergraphDecomposition:
         self.output_dir = output_dir or os.path.join(data_dir, "message_pool")
         
         # Data structures
-        self.entity_pairs = []  # [(kg1_id, kg2_id), ...] loaded from top-k file
+        self.entity_pairs = []  # [(kg1_id, kg2_id), ...] Read from top-k file
         self.kg1_triples = []  # [(head, rel, tail, time_start, time_end), ...]
         self.kg2_triples = []  # [(head, rel, tail, time_start, time_end), ...]
         self.kg1_entity_times = defaultdict(set)  # {entity_id: {time_id, ...}}
@@ -53,20 +53,20 @@ class HypergraphDecomposition:
         self.kg1_entity_relations = defaultdict(set)  # {entity_id: {(rel_id, tail_id), ...}}
         self.kg2_entity_relations = defaultdict(set)  # {entity_id: {(rel_id, tail_id), ...}}
         
-        # Relation alignment mapping {kg1_rel_id: {kg2_rel_id, ...}} supports one-to-many
+        # Relation alignment mapping {kg1_rel_id: {kg2_rel_id, ...}} Supports one-to-many
         self.relation_alignment = defaultdict(set)  # {kg1_rel_id: {kg2_rel_id, ...}}
         
         # Aspect entity mappings
         self.temporal_aspects = {}  # {aspect_id: (original_kg2_id, [(time_start, time_end), ...])}
         self.relational_aspects = {}  # {aspect_id: (original_kg2_id, {(rel_id, tail_id), ...})}
-        self.aspect_to_original = {}  # {aspect_id: original_kg2_id} for linking retrieval results
+        self.aspect_to_original = {}  # {aspect_id: original_kg2_id} For retrieval result linking
         
         # Aspect entity counters
         self.temporal_aspect_counter = 1000000  # Start from large number to avoid conflicts with real entity IDs
         self.relational_aspect_counter = 2000000
         
     def load_data(self):
-        """Load necessary data"""
+        """Load necessary data."""
         logger.info("Loading data for hypergraph decomposition...")
         
         # 1. Load entity pairs (from top-k file)
@@ -91,7 +91,7 @@ class HypergraphDecomposition:
         logger.info(f"  Relation alignments: {len(self.relation_alignment)}")
         
     def _load_entity_pairs(self):
-        """Load entity pairs from top-k file"""
+        """Load entity pairs from top-k file."""
         topk_file = os.path.join(self.data_dir, "message_pool", "integration_top_pair.txt")
         
         if not os.path.exists(topk_file):
@@ -115,7 +115,7 @@ class HypergraphDecomposition:
         logger.info(f"Loaded {len(self.entity_pairs)} entity pairs from top-k file")
     
     def _load_triples(self):
-        """Load triples data"""
+        """Load triple data."""
         # Load KG1 triples
         triples_1_path = os.path.join(self.data_dir, "triples_1")
         if os.path.exists(triples_1_path):
@@ -148,7 +148,7 @@ class HypergraphDecomposition:
         logger.info(f"Loaded KG2 triples: {len(self.kg2_triples)}")
     
     def _extract_entity_temporal_info(self):
-        """Extract entity temporal information"""
+        """Extract entity temporal information."""
         # KG1 entity times
         for head, rel, tail, time_start, time_end in self.kg1_triples:
             for entity_id in [head, tail]:
@@ -164,7 +164,7 @@ class HypergraphDecomposition:
         logger.info(f"Extracted temporal info: KG1={len(self.kg1_entity_times)}, KG2={len(self.kg2_entity_times)}")
     
     def _extract_entity_relation_info(self):
-        """Extract entity relation information (relations + tail entities when entity is head)"""
+        """Extract entity relation information (relations + tail entities when as head entity)."""
         # KG1 entity relations
         for head, rel, tail, time_start, time_end in self.kg1_triples:
             self.kg1_entity_relations[head].add((rel, tail))
@@ -177,7 +177,7 @@ class HypergraphDecomposition:
     
     def _get_common_time_intervals(self, kg1_id: int, kg2_id: int) -> List[Tuple[int, int]]:
         """
-        Get common time intervals for entity pair
+        Get common time intervals of entity pair.
         
         Args:
             kg1_id: KG1 entity ID
@@ -217,7 +217,7 @@ class HypergraphDecomposition:
         return intervals
     
     def _load_relation_alignment(self):
-        """Load relation alignment information"""
+        """Load relation alignment information."""
         alignment_file = os.path.join(self.output_dir, "relation_alignment.txt")
         if not os.path.exists(alignment_file):
             logger.warning(f"Relation alignment file not found: {alignment_file}")
@@ -252,11 +252,11 @@ class HypergraphDecomposition:
     
     def _get_common_relations(self, kg1_id: int, kg2_id: int) -> Set[Tuple[int, int]]:
         """
-        Get common relations + tail entities for entity pair (using relation alignment information)
+        Get common relations + tail entities of entity pair (using relation alignment information).
         
         Logic:
         1. Get all relations of KG1 entity
-        2. Through relation alignment, find corresponding KG2 relations
+        2. Find corresponding KG2 relations through relation alignment
         3. Check if KG2 entity has these aligned relations
         4. If KG2 has aligned relations, collect all combinations of relation + tail entity
         
@@ -293,13 +293,17 @@ class HypergraphDecomposition:
         
         return common_rels
     
-    def decompose(self) -> Dict[str, List[Tuple[int, int]]]:
+    def decompose(self, use_temporal_projection=True, use_relational_projection=True) -> Dict[str, List[Tuple[int, int]]]:
         """
-        Execute hypergraph decomposition
+        Execute hypergraph decomposition.
         
         For each entity pair, generate:
-        - A temporal aspect: containing all common time intervals
-        - A relational aspect: containing all common relation + tail entity combinations
+        - A temporal aspect: Contains all common time intervals (if enabled)
+        - A relational aspect: Contains all common relation + tail entity combinations (if enabled)
+        
+        Args:
+            use_temporal_projection: Whether to use temporal projection (ablation experiment option)
+            use_relational_projection: Whether to use relational projection (ablation experiment option)
         
         Returns:
             Dict containing:
@@ -314,29 +318,38 @@ class HypergraphDecomposition:
         
         for kg1_id, kg2_id in self.entity_pairs:
             # 1. Temporal projection: Generate a temporal aspect containing all common time intervals
-            common_intervals = self._get_common_time_intervals(kg1_id, kg2_id)
-            if common_intervals:
-                aspect_id = self.temporal_aspect_counter
-                self.temporal_aspect_counter += 1
-                
-                # Store all common time intervals
-                self.temporal_aspects[aspect_id] = (kg2_id, common_intervals)
-                self.aspect_to_original[aspect_id] = kg2_id
-                temporal_aspects.append((kg1_id, aspect_id))
+            if use_temporal_projection:
+                common_intervals = self._get_common_time_intervals(kg1_id, kg2_id)
+                if common_intervals:
+                    aspect_id = self.temporal_aspect_counter
+                    self.temporal_aspect_counter += 1
+                    
+                    # Store all common time intervals
+                    self.temporal_aspects[aspect_id] = (kg2_id, common_intervals)
+                    self.aspect_to_original[aspect_id] = kg2_id
+                    temporal_aspects.append((kg1_id, aspect_id))
             
             # 2. Relational projection: Generate a relational aspect containing all common relation + tail entity combinations
-            common_rels = self._get_common_relations(kg1_id, kg2_id)
-            if common_rels:
-                aspect_id = self.relational_aspect_counter
-                self.relational_aspect_counter += 1
-                
-                # Store all common relation + tail entity combinations
-                self.relational_aspects[aspect_id] = (kg2_id, common_rels)
-                self.aspect_to_original[aspect_id] = kg2_id
-                relational_aspects.append((kg1_id, aspect_id))
+            if use_relational_projection:
+                common_rels = self._get_common_relations(kg1_id, kg2_id)
+                if common_rels:
+                    aspect_id = self.relational_aspect_counter
+                    self.relational_aspect_counter += 1
+                    
+                    # Store all common relation + tail entity combinations
+                    self.relational_aspects[aspect_id] = (kg2_id, common_rels)
+                    self.aspect_to_original[aspect_id] = kg2_id
+                    relational_aspects.append((kg1_id, aspect_id))
         
-        logger.info(f"Generated temporal aspects: {len(temporal_aspects)}")
-        logger.info(f"Generated relational aspects: {len(relational_aspects)}")
+        if use_temporal_projection:
+            logger.info(f"Generated temporal aspects: {len(temporal_aspects)}")
+        else:
+            logger.info("Temporal projection disabled - no temporal aspects generated")
+        
+        if use_relational_projection:
+            logger.info(f"Generated relational aspects: {len(relational_aspects)}")
+        else:
+            logger.info("Relational projection disabled - no relational aspects generated")
         
         return {
             'temporal_aspects': temporal_aspects,
@@ -346,10 +359,10 @@ class HypergraphDecomposition:
     
     def save_decomposed_aspects(self, decomposition_results: Dict):
         """
-        Save decomposed aspect entities
+        Save decomposed aspect entities.
         
         Args:
-            decomposition_results: Return value of decompose() method
+            decomposition_results: Return result of decompose() method
         """
         os.makedirs(self.output_dir, exist_ok=True)
         
@@ -367,14 +380,14 @@ class HypergraphDecomposition:
                 f.write(f"{kg1_id}\t{aspect_id}\n")
         logger.info(f"Saved relational aspect pairs: {relational_file}")
         
-        # 3. Save aspect mapping (for linking retrieval results)
+        # 3. Save aspect mapping (for retrieval result linking)
         mapping_file = os.path.join(self.output_dir, "aspect_to_original_mapping.txt")
         with open(mapping_file, 'w', encoding='utf-8') as f:
             for aspect_id, original_id in decomposition_results['aspect_mapping'].items():
                 f.write(f"{aspect_id}\t{original_id}\n")
         logger.info(f"Saved aspect mapping: {mapping_file}")
         
-        # 4. Save temporal aspect detailed information (containing all common time intervals)
+        # 4. Save temporal aspect detailed information (including all common time intervals)
         temporal_info_file = os.path.join(self.output_dir, "temporal_aspect_info.txt")
         with open(temporal_info_file, 'w', encoding='utf-8') as f:
             for aspect_id, (original_id, intervals) in self.temporal_aspects.items():
@@ -383,7 +396,7 @@ class HypergraphDecomposition:
                 f.write(f"{aspect_id}\t{original_id}\t{intervals_str}\n")
         logger.info(f"Saved temporal aspect info: {temporal_info_file}")
         
-        # 5. Save relational aspect detailed information (containing all common relation + tail entity combinations)
+        # 5. Save relational aspect detailed information (including all common relation + tail entity combinations)
         relational_info_file = os.path.join(self.output_dir, "relational_aspect_info.txt")
         with open(relational_info_file, 'w', encoding='utf-8') as f:
             for aspect_id, (original_id, common_rels) in self.relational_aspects.items():
@@ -394,10 +407,10 @@ class HypergraphDecomposition:
     
     def create_aspect_entities_for_retrieval(self, decomposition_results: Dict) -> Set[int]:
         """
-        Create aspect entity set for retrieval
+        Create aspect entity set for retrieval.
         
         Args:
-            decomposition_results: Return value of decompose() method
+            decomposition_results: Return result of decompose() method
             
         Returns:
             Set of aspect entity IDs (temporal + relational)
@@ -417,13 +430,13 @@ class HypergraphDecomposition:
     def create_aspect_entity_names(self, aspect_ids: Set[int], ent_ids_2_path: str, 
                                    rel_ids_2_path: str = None, ent_ids_2_dict: Dict[int, str] = None) -> Dict[int, str]:
         """
-        Create names for aspect entities (based on original entity name + aspect information)
+        Create names for aspect entities (based on original entity name + aspect information).
         
         Args:
-            aspect_ids: Set of aspect entity IDs
+            aspect_ids: Aspect entity ID set
             ent_ids_2_path: KG2 entity file path
             rel_ids_2_path: KG2 relation file path (optional, for getting relation names)
-            ent_ids_2_dict: KG2 entity dictionary (optional, can pass directly if already loaded)
+            ent_ids_2_dict: KG2 entity dictionary (optional, if already loaded can be passed directly)
             
         Returns:
             Dict: {aspect_id: aspect_entity_name}
@@ -455,7 +468,7 @@ class HypergraphDecomposition:
         
         aspect_names = {}
         
-        # Temporal aspect names: original name + all common time intervals
+        # Temporal aspect names: Original name + all common time intervals
         for aspect_id, (original_id, intervals) in self.temporal_aspects.items():
             if aspect_id in aspect_ids:
                 original_name = original_entity_names.get(original_id, f"Entity_{original_id}")
@@ -470,7 +483,7 @@ class HypergraphDecomposition:
                 aspect_name = f"{original_name}_[T:{time_str}]"
                 aspect_names[aspect_id] = aspect_name
         
-        # Relational aspect names: original name + all common relation + tail entity combinations
+        # Relational aspect names: Original name + all common relation + tail entity combinations
         for aspect_id, (original_id, common_rels) in self.relational_aspects.items():
             if aspect_id in aspect_ids:
                 original_name = original_entity_names.get(original_id, f"Entity_{original_id}")
@@ -488,26 +501,35 @@ class HypergraphDecomposition:
         return aspect_names
 
 
-def run_hypergraph_decomposition(data_dir: str, output_dir: str = None):
+def run_hypergraph_decomposition(data_dir: str, output_dir: str = None, use_temporal_projection=True, use_relational_projection=True):
     """
-    Run hypergraph decomposition pipeline
+    Run hypergraph decomposition process.
     
     Args:
         data_dir: Data directory path
         output_dir: Output directory path (optional)
+        use_temporal_projection: Whether to use temporal projection (ablation experiment option)
+        use_relational_projection: Whether to use relational projection (ablation experiment option)
         
     Returns:
-        Dict: Decomposition results, containing aspect entity sets and mapping information
+        Dict: Decomposition results, containing aspect entity set and mapping information
     """
     logger.info("=" * 80)
     logger.info("Hypergraph Decomposition")
+    if not use_temporal_projection:
+        logger.info("⚠️  [ABLATION] Temporal projection is disabled")
+    if not use_relational_projection:
+        logger.info("⚠️  [ABLATION] Relational projection is disabled")
     logger.info("=" * 80)
     
     decomposer = HypergraphDecomposition(data_dir, output_dir)
     decomposer.load_data()
     
-    # Execute decomposition
-    decomposition_results = decomposer.decompose()
+    # Execute decomposition (pass ablation configuration)
+    decomposition_results = decomposer.decompose(
+        use_temporal_projection=use_temporal_projection,
+        use_relational_projection=use_relational_projection
+    )
     
     # Save results
     decomposer.save_decomposed_aspects(decomposition_results)

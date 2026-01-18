@@ -254,7 +254,7 @@ Download and extract datasets to `./data/`
 
 ```bash
 
-python HyDRA_main.py --data_dir data/icews_wiki
+python HyDRA_main.py --data_dir data/WildBETA
 
 ```
 
@@ -291,7 +291,7 @@ python HyDRA_main.py --data_dir data/icews_wiki
 
 ```bash
 
-python HyDRA_main.py --data_dir data/icews_wiki
+python HyDRA_main.py --data_dir data/WildBETA
 
 ```
 
@@ -307,7 +307,7 @@ python HyDRA_main.py --data_dir data/icews_wiki
 
 ```bash
 
-python HyDRA_main.py --data_dir data/icews_wiki \
+python HyDRA_main.py --data_dir data/WildBETA \
 
     --cuda 0 \
 
@@ -328,8 +328,6 @@ python HyDRA_main.py --data_dir data/icews_wiki \
 | Parameter | Type | Default | Description |
 |:---|:---:|:---:|:---|
 | `--data_dir` | str | **Required** | Path to dataset directory |
-| `--skip_s4` | flag | False | Skip encoding stage (if results already exist) |
-| `--only_s4` | flag | False | Run only encoding stage |
 | `--cuda` | int | 0 | CUDA device ID for training |
 | `--epochs` | int | 500 | Number of training epochs for encoding stage |
 | `--max_iterations` | int | 3 | Maximum pipeline iterations |
@@ -385,7 +383,7 @@ To reproduce the main experimental results reported in the paper:
 
 ```bash
 
-python HyDRA_main.py --data_dir data/icews_wiki
+python HyDRA_main.py --data_dir data/WildBETA
 
 ```
 

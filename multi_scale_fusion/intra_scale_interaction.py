@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Intra-Scale Interaction and Conflict Detection Module
+Intra-scale Interaction and Conflict Detection Module
 
-Features:
-1. Intra-scale interaction: Analyze interactions and consistency between candidate entities within each scale
+Functionality:
+1. Intra-scale interaction: Analyze interactions and consistency among candidate entities within each scale
 2. Conflict detection: Detect cross-scale conflicts and intra-scale conflicts
 3. Generate conflict reports to guide multi-scale fusion decisions
 """
@@ -21,11 +21,11 @@ sys.path.append(project_root)
 def analyze_intra_scale_interaction(candidate_info: Dict[str, List[int]], 
                                     ent_names_2: Dict[int, str]) -> Dict[str, Dict]:
     """
-    Analyze intra-scale interaction
+    Analyze intra-scale interaction.
     
     For each scale, analyze:
     1. Ranking distribution of candidate entities
-    2. Correlation between candidate entities (if duplicate entities appear in multiple scales)
+    2. Correlation among candidate entities (if duplicate entities appear in multiple scales)
     3. Confidence distribution within the scale
     
     Args:
@@ -56,7 +56,7 @@ def analyze_intra_scale_interaction(candidate_info: Dict[str, List[int]],
             'confidence_signal': 'weak'
         }
         
-        # Determine confidence signal based on candidate count
+        # Judge confidence signal based on candidate count
         if len(candidates) == 1:
             # Single candidate, high confidence
             analysis['confidence_signal'] = 'strong'
@@ -75,9 +75,9 @@ def analyze_intra_scale_interaction(candidate_info: Dict[str, List[int]],
 def detect_cross_scale_conflicts(candidate_info: Dict[str, List[int]],
                                  scale_analysis: Dict[str, Dict]) -> Dict:
     """
-    Detect cross-scale conflicts
+    Detect cross-scale conflicts.
     
-    Detect whether the TOP-1 candidate entities recommended by different scales are consistent
+    Detect whether the TOP-1 candidate entities recommended by different scales are consistent.
     
     Args:
         candidate_info: {'L1': [kg2_ids], 'L2': [kg2_ids], 'L3': [kg2_ids]}
@@ -94,7 +94,7 @@ def detect_cross_scale_conflicts(candidate_info: Dict[str, List[int]],
             'conflict_details': str
         }
     """
-    # Get TOP-1 candidate from each scale
+    # Get TOP-1 candidate for each scale
     top_candidates = {}
     for scale in ['L1', 'L2', 'L3']:
         candidates = candidate_info.get(scale, [])
@@ -137,7 +137,7 @@ def detect_cross_scale_conflicts(candidate_info: Dict[str, List[int]],
     for kg2_id in top_values:
         candidate_counts[kg2_id] += 1
     
-    # Find candidate with most occurrences (majority voting)
+    # Find candidate with most occurrences (majority vote)
     if candidate_counts:
         consensus_candidate = max(candidate_counts.items(), key=lambda x: x[1])[0]
     
@@ -163,10 +163,10 @@ def detect_cross_scale_conflicts(candidate_info: Dict[str, List[int]],
 def detect_intra_scale_conflicts(candidate_info: Dict[str, List[int]],
                                  scale_analysis: Dict[str, Dict]) -> Dict:
     """
-    Detect intra-scale conflicts
+    Detect intra-scale conflicts.
     
-    Detect whether there are multiple high-confidence but contradictory candidate entities within a single scale
-    (e.g., many candidate entities, and the top few candidates all have high confidence)
+    Detect whether there are multiple high-confidence but conflicting candidate entities within a single scale
+    (e.g., many candidate entities, and the top few candidates all have high confidence).
     
     Args:
         candidate_info: {'L1': [kg2_ids], 'L2': [kg2_ids], 'L3': [kg2_ids]}
@@ -186,7 +186,7 @@ def detect_intra_scale_conflicts(candidate_info: Dict[str, List[int]],
         candidates = candidate_info.get(scale, [])
         
         # If candidate count is high (>3), intra-scale conflict may exist
-        # Or if candidate count is moderate (2-3), but needs further judgment
+        # Or if candidate count is moderate (2-3), further judgment is needed
         if len(candidates) > 3:
             conflicted_scales.append(scale)
             conflict_details[scale] = f"Multiple candidates ({len(candidates)}) in {scale} scale, may need further verification"
@@ -201,7 +201,7 @@ def generate_conflict_summary(cross_scale_conflicts: Dict,
                               intra_scale_conflicts: Dict,
                               scale_analysis: Dict[str, Dict]) -> str:
     """
-    Generate conflict summary for LLM Prompt
+    Generate conflict summary for LLM Prompt.
     
     Args:
         cross_scale_conflicts: Cross-scale conflict detection results

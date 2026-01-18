@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """
-Multi-Scale Interactive Enhancement Fusion Module
+Multi-Scale Interaction-Augmented Fusion Module
 
-Features:
+Functionality:
 1. Read hypergraph entity pair files from L1, L2, L3 scales
 2. For each KG1 entity, collect candidate entities from three scales
-3. Use large language model to judge candidate entities and select best aligned entity
-4. Output results from large language model judgment
+3. Use LLM to judge candidate entities and select the best alignment entity
+4. Output LLM judgment results
 
 Reference: Logic from LLM_executor.py
 """
@@ -63,7 +63,7 @@ except ImportError:
 
 
 def load_entity_names(file_path):
-    """Load entity ID to name mapping"""
+    """Load entity ID to name mapping."""
     entity_names = {}
     if not os.path.exists(file_path):
         print(f"Warning: Entity file not found: {file_path}")
@@ -84,7 +84,7 @@ def load_entity_names(file_path):
 
 def load_multi_scale_pairs(data_dir):
     """
-    Load entity pairs from multi-scale hypergraphs
+    Load multi-scale hypergraph entity pairs.
     
     Args:
         data_dir: Data directory path
@@ -131,7 +131,7 @@ def load_multi_scale_pairs(data_dir):
 
 
 def load_triples(file_path):
-    """Load triples data"""
+    """Load triple data."""
     triples = []
     if not os.path.exists(file_path):
         return triples
@@ -147,7 +147,7 @@ def load_triples(file_path):
 
 
 def load_relation_names(file_path):
-    """Load relation names"""
+    """Load relation names."""
     rel_names = {}
     if not os.path.exists(file_path):
         return rel_names
@@ -166,12 +166,12 @@ def load_relation_names(file_path):
 
 def get_entity_context(entity_id, entity_names, triples=None, rel_names=None, n=3):
     """
-    Get entity context information (including relation information for semantic judgment)
+    Get entity context information (including relation information for semantic judgment).
     
     Args:
         entity_id: Entity ID
         entity_names: Entity name dictionary
-        triples: Triples list (optional)
+        triples: Triple list (optional)
         rel_names: Relation name dictionary (optional)
         n: Return top n relations
         
@@ -203,17 +203,30 @@ def get_entity_context(entity_id, entity_names, triples=None, rel_names=None, n=
     return context
 
 
-def multi_scale_fusion(data_dir, output_file=None):
+def multi_scale_fusion(data_dir, output_file=None, ablation_config=None):
     """
-    Multi-scale interactive enhancement fusion
+    Multi-scale interaction-augmented fusion.
     
     Args:
         data_dir: Data directory path
         output_file: Output file path (default: message_pool/multi_scale_fusion_results.txt)
+        ablation_config: Ablation experiment configuration (AblationConfig object)
     """
     print("\n" + "=" * 80)
-    print("Multi-Scale Fusion: Multi-Scale Interactive Enhancement")
+    print("Stage 4: Multi-Scale Fusion")
+    if ablation_config:
+        print(f"Ablation: {ablation_config.get_description()}")
     print("=" * 80 + "\n")
+    
+    # Ablation: use simplified fusion if multi-scale interaction-augmented fusion is disabled
+    use_interaction_augmented = not (ablation_config and not ablation_config.use_multi_scale_interaction_augmented_fusion)
+    
+    if not use_interaction_augmented:
+        print("⚠️  [ABLATION] Multi-Scale Interaction-Augmented Fusion is disabled")
+        print("  Using simplified fusion (without interaction and conflict detection)")
+        # Import simplified fusion function
+        from multi_scale_fusion.multi_scale_fusion_simplified import multi_scale_fusion_simplified
+        return multi_scale_fusion_simplified(data_dir, output_file, ablation_config)
     
     # Set file paths
     message_pool_dir = os.path.join(data_dir, "message_pool")
@@ -245,16 +258,49 @@ def multi_scale_fusion(data_dir, output_file=None):
     print(f"Loaded {len(rel_names_2)} KG2 relations")
     
     # Load multi-scale entity pairs
-    multi_scale_pairs = load_multi_scale_pairs(data_dir)
+    # Ablation: use only L1 scale if multi-scale hypergraph is disabled
+    use_multi_scale = not (ablation_config and not ablation_config.use_multi_scale_hypergraph)
+    
+    if use_multi_scale:
+        multi_scale_pairs = load_multi_scale_pairs(data_dir)
+    else:
+        print("⚠️  [ABLATION] Using single-scale (L1 only) pairs")
+        # Load only L1 scale entity pairs
+        message_pool_dir = os.path.join(data_dir, "message_pool")
+        l1_file = os.path.join(message_pool_dir, "multi_scale_hypergraph", "L1_hypergraph.txt")
+        if not os.path.exists(l1_file):
+            # If no L1 file, try loading from integration_top_pair.txt
+            l1_file = os.path.join(message_pool_dir, "integration_top_pair.txt")
+        
+        multi_scale_pairs = defaultdict(lambda: {'L1': [], 'L2': [], 'L3': []})
+        if os.path.exists(l1_file):
+            with open(l1_file, 'r', encoding='utf-8') as f:
+                for line in f:
+                    line = line.strip()
+                    if not line:
+                        continue
+                    parts = line.split('\t')
+                    if len(parts) >= 2:
+                        try:
+                            kg1_id = int(parts[0])
+                            kg2_id = int(parts[1])
+                            multi_scale_pairs[kg1_id]['L1'].append(kg2_id)
+                        except ValueError:
+                            continue
     
     if not multi_scale_pairs:
-        print("Error: No multi-scale pairs found. Please run s4_to_retrieval.py first.")
+        print("Error: No multi-scale pairs found. Please run Stage 2: Scale-Adaptive Entity Projection first.")
         return []
     
-    # Setup OpenAI client
-    # Note: API credentials should be configured via environment variables or config file
-    # Example: client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-    client = None  # TODO: Configure OpenAI client with proper credentials
+    # Set OpenAI client
+    client = OpenAI(
+        base_url="xxx",
+        api_key="xxx",
+        http_client=httpx.Client(
+            base_url="xxx",
+            follow_redirects=True,
+        ),
+    )
     
     # LLM Agent Profile
     LLM_Agent_Profile = '''
@@ -279,14 +325,14 @@ Constraint:
     
     def fusion_task(kg1_entity, candidate_info):
         """
-        Perform multi-scale fusion judgment for a single KG1 entity
+        Perform multi-scale fusion judgment for a single KG1 entity.
         
         Args:
             kg1_entity: KG1 entity ID
             candidate_info: {'L1': [kg2_ids], 'L2': [kg2_ids], 'L3': [kg2_ids]}
         """
         try:
-            # Collect all candidate entities (deduplicated)
+            # Collect all candidate entities (deduplicate)
             all_candidates = set()
             scale_to_candidates = {}
             
@@ -299,21 +345,43 @@ Constraint:
                 return
             
             # ===== Intra-scale interaction and conflict detection =====
-            # 1. Analyze intra-scale interaction
-            scale_analysis = analyze_intra_scale_interaction(candidate_info, ent_names_2)
+            # Ablation: decide whether to use these components based on configuration
+            use_intra_scale_interaction = not (ablation_config and not ablation_config.use_intra_scale_interaction)
+            use_conflict_detection = not (ablation_config and not ablation_config.use_conflict_detection)
             
-            # 2. Detect cross-scale conflicts
-            cross_scale_conflicts = detect_cross_scale_conflicts(candidate_info, scale_analysis)
+            if use_intra_scale_interaction:
+                # 1. Analyze intra-scale interaction
+                scale_analysis = analyze_intra_scale_interaction(candidate_info, ent_names_2)
+            else:
+                # Ablation: do not use intra-scale interaction, create empty scale_analysis
+                scale_analysis = {}
+                for scale in ['L1', 'L2', 'L3']:
+                    candidates = candidate_info.get(scale, [])
+                    scale_analysis[scale] = {
+                        'candidate_count': len(candidates),
+                        'candidates': candidates,
+                        'top_candidate': candidates[0] if candidates else None,
+                        'confidence_signal': 'unknown'
+                    }
             
-            # 3. Detect intra-scale conflicts
-            intra_scale_conflicts = detect_intra_scale_conflicts(candidate_info, scale_analysis)
-            
-            # 4. Generate conflict summary
-            conflict_summary = generate_conflict_summary(
-                cross_scale_conflicts, 
-                intra_scale_conflicts, 
-                scale_analysis
-            )
+            if use_conflict_detection:
+                # 2. Detect cross-scale conflicts
+                cross_scale_conflicts = detect_cross_scale_conflicts(candidate_info, scale_analysis)
+                
+                # 3. Detect intra-scale conflicts
+                intra_scale_conflicts = detect_intra_scale_conflicts(candidate_info, scale_analysis)
+                
+                # 4. Generate conflict summary
+                conflict_summary = generate_conflict_summary(
+                    cross_scale_conflicts, 
+                    intra_scale_conflicts, 
+                    scale_analysis
+                )
+            else:
+                # Ablation: do not use conflict detection, create empty conflict summary
+                cross_scale_conflicts = {'has_conflict': False}
+                intra_scale_conflicts = {'conflicted_scales': []}
+                conflict_summary = "No conflict detection (ablation)"
             # ===== End conflict detection =====
             
             # Build KG1 entity context (including relation information for semantic judgment)
@@ -349,7 +417,11 @@ Candidate entities from multiple scales:"""
             for i, candidate in enumerate(candidates_contexts, 1):
                 prompt += f"\n\nCandidate {i} (KG2, ID: {candidate['entity_id']}, from {candidate['scale']} scale):\n{candidate['context']}"
             
-            prompt += """\n\nSemantic Consistency Judgment:
+            # Ablation: adjust prompt based on configuration
+            use_fusion_reasoning = not (ablation_config and not ablation_config.use_multi_scale_fusion_reasoning)
+            
+            if use_fusion_reasoning:
+                prompt += """\n\nSemantic Consistency Judgment:
 Do any of these candidate entities represent the SAME REAL-WORLD OBJECT as Entity 1?
 
 Please judge based on SEMANTIC MEANING:
@@ -358,6 +430,21 @@ Please judge based on SEMANTIC MEANING:
 3. Consider the consistency across different scales (L1, L2, L3)
 4. Pay attention to any conflicts detected above
 5. Prefer candidates with higher consensus across scales
+
+IMPORTANT: 
+- Focus on SEMANTIC EQUIVALENCE (same real-world object), not just ID matching
+- Two entities are aligned if they represent the same real-world entity semantically
+- If there is a semantically matching entity, return ONLY the entity ID (e.g., "26471")
+- If none of them match (not the same real-world object), return ONLY "No"
+- Do NOT include any explanation, only return the entity ID or "No":"""
+            else:
+                # Ablation: simplified prompt, do not use multi-scale fusion reasoning
+                prompt += """\n\nSemantic Consistency Judgment:
+Do any of these candidate entities represent the SAME REAL-WORLD OBJECT as Entity 1?
+
+Please judge based on SEMANTIC MEANING:
+1. Compare entity names - are they referring to the same real-world entity?
+2. Compare relationships - do they have similar semantic relationships?
 
 IMPORTANT: 
 - Focus on SEMANTIC EQUIVALENCE (same real-world object), not just ID matching
@@ -437,7 +524,7 @@ IMPORTANT:
 
 
 def deduplicate_output_file(file_path):
-    """Deduplicate output file"""
+    """Deduplicate output file."""
     if not os.path.exists(file_path):
         return set()
     
@@ -468,9 +555,9 @@ def deduplicate_output_file(file_path):
 
 def add_to_sup_pairs(data_dir, aligned_pairs):
     """
-    Selectively add fusion results to sup_pairs
+    Selectively add fusion results to sup_pairs.
     
-    Rule: A pair (KG1 entity and KG2 entity) can be added if neither has appeared in sup_pairs
+    Rule: If an entity pair (KG1 entity and KG2 entity) has not appeared in sup_pairs, it can be added
     - KG1 entity has not appeared in sup_pairs (as first column)
     - KG2 entity has not appeared in sup_pairs (as second column)
     
@@ -479,7 +566,7 @@ def add_to_sup_pairs(data_dir, aligned_pairs):
         aligned_pairs: List of aligned entity pairs [(kg1_id, kg2_id), ...]
     
     Returns:
-        int: Number of successfully added entity pairs
+        int: Number of entity pairs successfully added
     """
     if not aligned_pairs:
         return 0
@@ -508,7 +595,7 @@ def add_to_sup_pairs(data_dir, aligned_pairs):
                     except ValueError:
                         continue
     
-    # Filter eligible entity pairs
+    # Filter qualified entity pairs
     new_pairs = []
     for kg1_id, kg2_id in aligned_pairs:
         # Check if KG1 entity already exists
@@ -520,7 +607,7 @@ def add_to_sup_pairs(data_dir, aligned_pairs):
         # Check if completely duplicate
         if (kg1_id, kg2_id) in sup_pairs:
             continue
-        # Eligible entity pairs
+        # Qualified entity pair
         new_pairs.append((kg1_id, kg2_id))
     
     if not new_pairs:
@@ -552,7 +639,7 @@ def add_to_sup_pairs(data_dir, aligned_pairs):
 
 
 def main():
-    """Main function"""
+    """Main function."""
     import argparse
     
     parser = argparse.ArgumentParser(
@@ -560,10 +647,10 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Example usage:
-  # 基本用法
+  # Basic usage
   python multi_scale_fusion.py --data_dir /path/to/data/icews_wiki
   
-  # 指定输出文件
+  # Specify output file
   python multi_scale_fusion.py --data_dir /path/to/data/icews_wiki --output custom_output.txt
         """
     )

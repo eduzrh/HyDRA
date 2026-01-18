@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Standalone Relation Alignment Stage
+Standalone script to run relation alignment stage
 
-Features:
+Functionality:
 1. Run relation alignment and generate relation alignment file
 2. As an independent processing stage, can be run before hypergraph decomposition
 
@@ -23,7 +23,7 @@ from relation_alignment import find_relation_alignments, load_relations, save_re
 
 def run_relation_alignment_stage(data_dir, text_threshold=0.4, use_cooccurrence=True):
     """
-    Run relation alignment stage
+    Run relation alignment stage.
     
     Args:
         data_dir: Data directory path
@@ -78,7 +78,7 @@ def run_relation_alignment_stage(data_dir, text_threshold=0.4, use_cooccurrence=
     print("Relation Alignment Statistics")
     print("=" * 80)
     
-    # Statistics for one-to-many/many-to-one
+    # Count one-to-many/many-to-one
     kg1_to_kg2 = {}
     kg2_to_kg1 = {}
     for kg1_rel_id, kg2_rel_id, score, method in alignments:

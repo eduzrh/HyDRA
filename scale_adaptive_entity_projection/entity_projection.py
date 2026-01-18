@@ -1,18 +1,20 @@
 #!/usr/bin/env python3
 """
-S4 to Retrieval Connection Script
+Stage 2: Scale-Adaptive Entity Projection
 
-Features:
-1. Read top-k results from Simple-HHEA output (integration_top_pair.txt)
+Connects Encoding and Integration output to retrieval stage.
+
+Process:
+1. Read top-k results from Simple-HHEA (integration_top_pair.txt)
 2. Extract KG2 entity IDs and convert to retrieval document format (inrag_ent_ids_2_pre_embeding.txt)
-3. Use KG1 entities as queries and call neural_retrieval for retrieval
+3. Use KG1 entities as queries and call neural_retrieval
 
 Input:
-- Top-k file from Simple-HHEA output: data/{dataset}/message_pool/integration_top_pair.txt
+- Top-k file: data/{dataset}/message_pool/integration_top_pair.txt
   Format: kg1_entity_id\tkg2_entity_id
 
 Output:
-- Retrieval document file: data/{dataset}/inrag_ent_ids_2_pre_embeding.txt
+- Retrieval document: data/{dataset}/inrag_ent_ids_2_pre_embeding.txt
   Format: entity_id\tentity_name
 - Retrieval results: data/{dataset}/message_pool/retriever_outputs.txt
   Format: kg1_entity_id\tkg2_entity_id
@@ -34,7 +36,7 @@ from scale_adaptive_entity_projection.run_relation_alignment import run_relation
 
 def load_entity_ids(entity_file_path):
     """
-    Load entity ID to entity name mapping
+    Load entity ID to entity name mapping.
     
     Args:
         entity_file_path: Entity file path (ent_ids_1 or ent_ids_2)
@@ -64,7 +66,7 @@ def load_entity_ids(entity_file_path):
 
 def extract_entities_from_topk(topk_file_path):
     """
-    Extract KG1 and KG2 entity ID sets from Simple-HHEA top-k output file
+    Extract KG1 and KG2 entity ID sets from Simple-HHEA top-k output file.
     
     Args:
         topk_file_path: Top-k result file path
@@ -98,7 +100,7 @@ def extract_entities_from_topk(topk_file_path):
 
 def extract_kg2_entities_from_topk(topk_file_path):
     """
-    Extract KG2 entity ID set from Simple-HHEA top-k output file (for backward compatibility)
+    Extract KG2 entity ID set from Simple-HHEA top-k output file (for backward compatibility).
     
     Args:
         topk_file_path: Top-k result file path
@@ -112,7 +114,7 @@ def extract_kg2_entities_from_topk(topk_file_path):
 
 def create_retrieval_document(data_dir, kg2_entity_ids, ent_ids_2_path, output_file_path):
     """
-    Create retrieval document file (inrag_ent_ids_2_pre_embeding.txt)
+    Create retrieval document file (inrag_ent_ids_2_pre_embeding.txt).
     
     Args:
         data_dir: Data directory
@@ -121,7 +123,7 @@ def create_retrieval_document(data_dir, kg2_entity_ids, ent_ids_2_path, output_f
         output_file_path: Output file path
         
     Returns:
-        int: Number of successfully written entities
+        int: Number of entities successfully written
     """
     # Load all KG2 entities
     all_kg2_entities = load_entity_ids(ent_ids_2_path)
@@ -146,18 +148,18 @@ def create_retrieval_document(data_dir, kg2_entity_ids, ent_ids_2_path, output_f
 
 def create_retrieval_document_with_aspects(data_dir, kg2_entity_ids, aspect_ids, aspect_names, ent_ids_2_path, output_file_path):
     """
-    Create retrieval document file (including original KG2 entities and aspect entities)
+    Create retrieval document file (including original KG2 entities and aspect entities).
     
     Args:
         data_dir: Data directory
         kg2_entity_ids: Original KG2 entity ID set
         aspect_ids: Aspect entity ID set
-        aspect_names: Aspect entity name dictionary {aspect_id: aspect_name}
+        aspect_names: Aspect entity name dict {aspect_id: aspect_name}
         ent_ids_2_path: KG2 entity file path
         output_file_path: Output file path
         
     Returns:
-        int: Number of successfully written entities
+        int: Number of entities successfully written
     """
     # Load all KG2 entities
     all_kg2_entities = load_entity_ids(ent_ids_2_path)
@@ -188,7 +190,7 @@ def create_retrieval_document_with_aspects(data_dir, kg2_entity_ids, aspect_ids,
 
 def create_query_entities_file(data_dir, kg1_entity_ids, ent_ids_1_path, output_file_path):
     """
-    Create query entities file (only contains KG1 entities from top-k results)
+    Create query entities file (only includes KG1 entities from top-k results).
     
     Args:
         data_dir: Data directory
@@ -197,7 +199,7 @@ def create_query_entities_file(data_dir, kg1_entity_ids, ent_ids_1_path, output_
         output_file_path: Output file path (temporary file)
         
     Returns:
-        int: Number of successfully written entities
+        int: Number of entities successfully written
     """
     # Load all KG1 entities
     all_kg1_entities = load_entity_ids(ent_ids_1_path)
@@ -220,24 +222,42 @@ def create_query_entities_file(data_dir, kg1_entity_ids, ent_ids_1_path, output_
     return written_count
 
 
-def s4_to_retrieval(data_dir, dataset_name=None, iteration=1, force_update=False):
+def s4_to_retrieval(data_dir, dataset_name=None, iteration=1, force_update=False, ablation_config=None):
     """
-    Convert Simple-HHEA top-k output to retrieval format and execute retrieval
+    Stage 2: Scale-Adaptive Entity Projection
+    
+    Convert Encoding and Integration top-k output to retrieval format and perform retrieval.
     
     Process:
-    1. Read Simple-HHEA top-k output (integration_top_pair.txt)
+    1. Read Encoding and Integration top-k output (integration_top_pair.txt)
     2. Extract KG2 entity IDs and create retrieval document (inrag_ent_ids_2_pre_embeding.txt)
-    3. Use KG1 entities as queries and call neural_retrieval for retrieval
+    3. Use KG1 entities as queries and call neural_retrieval
     
     Args:
         data_dir: Data directory path (e.g., /path/to/data/icews_wiki)
-        dataset_name: Dataset name (optional, extracted from data_dir path if not provided)
+        dataset_name: Dataset name (optional, extracted from data_dir if not provided)
         iteration: Current iteration number (default: 1)
-        force_update: Whether to force update projection coverage file and FAISS index (default: False, automatically set to True for iterations after the first)
+        force_update: Whether to force update projection coverage files and FAISS index (default: False, automatically set to True after first iteration)
+        ablation_config: Ablation experiment configuration (AblationConfig object)
     """
     print("\n" + "=" * 80)
-    print("S4 to Retrieval: Connect Simple-HHEA output and Neural Retrieval")
+    print("Stage 2: Scale-Adaptive Entity Projection")
+    if ablation_config:
+        print(f"Ablation: {ablation_config.get_description()}")
     print("=" * 80 + "\n")
+    
+    # Ablation: skip entire stage
+    if ablation_config and not ablation_config.use_scale_adaptive_entity_projection:
+        print("⚠️  [ABLATION] Scale-Adaptive Entity Projection is disabled")
+        print("  Skipping Stage 2, using direct integration_top_pair.txt as output")
+        # Directly copy integration_top_pair.txt as output for subsequent stages
+        topk_file = os.path.join(data_dir, "message_pool", "integration_top_pair.txt")
+        output_file = os.path.join(data_dir, "message_pool", "retriever_outputs.txt")
+        if os.path.exists(topk_file):
+            import shutil
+            shutil.copy2(topk_file, output_file)
+            print(f"  Copied {topk_file} to {output_file}")
+        return True
     
     # Get dataset name
     if dataset_name is None:
@@ -252,49 +272,77 @@ def s4_to_retrieval(data_dir, dataset_name=None, iteration=1, force_update=False
     # Step 1: Check if top-k file exists
     if not os.path.exists(topk_file_path):
         print(f"Error: Top-k file not found: {topk_file_path}")
-        print("Please run Simple-HHEA first to generate the top-k results.")
+        print("Please run Stage 1: Encoding and Integration first to generate the top-k results.")
         return False
     
     print(f"Step 1: Reading top-k results from: {topk_file_path}")
     
     # Step 1.5: Relation alignment (run before hypergraph decomposition)
-    print(f"\nStep 1.5: Relation Alignment (before hypergraph decomposition)...")
-    alignment_file = run_relation_alignment_stage(
-        data_dir,
-        text_threshold=0.4,
-        use_cooccurrence=True
-    )
-    if alignment_file:
-        print(f"  Relation alignment completed: {alignment_file}")
+    # Ablation: skip relation alignment if adaptive relation projection is disabled
+    use_relation_alignment = not (ablation_config and not ablation_config.use_adaptive_relation_projection)
+    
+    if use_relation_alignment:
+        print(f"\nStep 1.5: Relation Alignment (before hypergraph decomposition)...")
+        alignment_file = run_relation_alignment_stage(
+            data_dir,
+            text_threshold=0.4,
+            use_cooccurrence=True
+        )
+        if alignment_file:
+            print(f"  Relation alignment completed: {alignment_file}")
+        else:
+            print(f"  Warning: Relation alignment failed or returned empty results")
+            print(f"  Hypergraph decomposition will proceed without relation alignment")
     else:
-        print(f"  Warning: Relation alignment failed or returned empty results")
-        print(f"  Hypergraph decomposition will proceed without relation alignment")
+        print(f"\n⚠️  [ABLATION] Relation Alignment is disabled (w/o Adaptive Relation Projection)")
     
     # Step 2: Hypergraph decomposition (decompose entity pairs into multiple aspects of KG2 entities)
-    print(f"\nStep 2: Hypergraph Decomposition (creating aspect entities)...")
-    try:
-        decomposition_result = run_hypergraph_decomposition(data_dir, os.path.join(data_dir, "message_pool"))
-        
-        if not decomposition_result:
-            print("Error: Hypergraph decomposition failed.")
-            return False
-        
-        # Get decomposed aspect entities
-        aspect_ids = decomposition_result['aspect_ids']
-        aspect_names = decomposition_result['aspect_names']
-        aspect_mapping = decomposition_result['aspect_mapping']
-        
-        print(f"  Generated {len(aspect_ids)} aspect entities:")
-        print(f"    - Temporal aspects: {len(decomposition_result['temporal_aspects'])}")
-        print(f"    - Relational aspects: {len(decomposition_result['relational_aspects'])}")
-    except Exception as e:
-        print(f"Warning: Hypergraph decomposition failed: {str(e)}")
-        print("  Continuing without aspect entities...")
+    # Ablation: skip hypergraph decomposition if adaptive time projection and relation projection are disabled
+    use_time_projection = not (ablation_config and not ablation_config.use_adaptive_time_projection)
+    use_rel_projection = not (ablation_config and not ablation_config.use_adaptive_relation_projection)
+    
+    if use_time_projection or use_rel_projection:
+        print(f"\nStep 2: Hypergraph Decomposition (creating aspect entities)...")
+        if ablation_config:
+            if not use_time_projection:
+                print("  ⚠️  [ABLATION] Temporal projection is disabled")
+            if not use_rel_projection:
+                print("  ⚠️  [ABLATION] Relational projection is disabled")
+        try:
+            decomposition_result = run_hypergraph_decomposition(
+                data_dir, 
+                os.path.join(data_dir, "message_pool"),
+                use_temporal_projection=use_time_projection,
+                use_relational_projection=use_rel_projection
+            )
+            
+            if not decomposition_result:
+                print("Error: Hypergraph decomposition failed.")
+                return False
+            
+            # Get decomposed aspect entities
+            aspect_ids = decomposition_result['aspect_ids']
+            aspect_names = decomposition_result['aspect_names']
+            aspect_mapping = decomposition_result['aspect_mapping']
+            
+            print(f"  Generated {len(aspect_ids)} aspect entities:")
+            if use_time_projection:
+                print(f"    - Temporal aspects: {len(decomposition_result['temporal_aspects'])}")
+            if use_rel_projection:
+                print(f"    - Relational aspects: {len(decomposition_result['relational_aspects'])}")
+        except Exception as e:
+            print(f"Warning: Hypergraph decomposition failed: {str(e)}")
+            print("  Continuing without aspect entities...")
+            aspect_ids = set()
+            aspect_names = {}
+            aspect_mapping = {}
+    else:
+        print(f"\n⚠️  [ABLATION] Hypergraph Decomposition is disabled (both temporal and relational projections are disabled)")
         aspect_ids = set()
         aspect_names = {}
         aspect_mapping = {}
     
-    # Step 3: Extract original KG1 and KG2 entity IDs (for query and original entity retrieval)
+    # Step 3: Extract original KG1 and KG2 entity IDs (for queries and original entity retrieval)
     print(f"\nStep 3: Extracting original entities from top-k results...")
     kg1_entity_ids, kg2_entity_ids = extract_entities_from_topk(topk_file_path)
     
@@ -323,7 +371,7 @@ def s4_to_retrieval(data_dir, dataset_name=None, iteration=1, force_update=False
         print("Error: Failed to create retrieval document.")
         return False
     
-    # Step 5: Create query entities file (KG1 entities, only those in top-k)
+    # Step 5: Create query entities file (KG1 entities, only includes entities from top-k)
     print(f"\nStep 5: Creating query entities file (KG1 entities from top-k)...")
     query_file = os.path.join(data_dir, "message_pool", "query_ent_ids_1.txt")
     query_count = create_query_entities_file(
@@ -366,7 +414,42 @@ def s4_to_retrieval(data_dir, dataset_name=None, iteration=1, force_update=False
         else:
             print()
         
-        neural_retrieval(data_dir, force_rebuild_index=force_update)
+        # Calculate max_aspects_per_entity based on max_entities and original entity count
+        # Default: max_entities=20000, allow some aspects but control the count
+        max_entities = 20000
+        max_aspects_per_entity = None  # Will be calculated if needed
+        
+        # If we have too many aspects, limit them
+        if len(aspect_ids) > 0:
+            num_original = len(kg2_entity_ids)
+            num_aspects_available = max_entities - num_original
+            if num_aspects_available > 0 and len(aspect_ids) > num_aspects_available:
+                # Calculate max aspects per entity to fit within limit
+                max_aspects_per_entity = max(1, num_aspects_available // num_original) if num_original > 0 else None
+                print(f"  - Limiting aspects: {num_aspects_available} available slots, max {max_aspects_per_entity} per entity")
+        
+        # Ablation: skip retrieval step if multi-scale hypergraph retrieval is disabled
+        use_retrieval = not (ablation_config and not ablation_config.use_multi_scale_hypergraph_retrieval)
+        
+        if use_retrieval:
+            neural_retrieval(
+                data_dir, 
+                force_rebuild_index=force_update,
+                max_entities=max_entities,
+                filter_aspects=False,  # Keep aspects but control count
+                max_aspects_per_entity=max_aspects_per_entity,
+                deduplicate=True  # Remove duplicates before embedding
+            )
+        else:
+            print("⚠️  [ABLATION] Neural Retrieval is disabled (w/o Multi-Scale Hypergraph Retrieval)")
+            print("  Using integration_top_pair.txt directly as retriever_outputs.txt")
+            # Directly copy integration_top_pair.txt
+            topk_file = os.path.join(data_dir, "message_pool", "integration_top_pair.txt")
+            retrieval_output_file = os.path.join(data_dir, "message_pool", "retriever_outputs.txt")
+            if os.path.exists(topk_file):
+                import shutil
+                shutil.copy2(topk_file, retrieval_output_file)
+                print(f"  Copied {topk_file} to {retrieval_output_file}")
         print("\n✓ Neural retrieval completed successfully!")
         
         # Step 8: Link retrieval results to original entities
@@ -388,8 +471,16 @@ def s4_to_retrieval(data_dir, dataset_name=None, iteration=1, force_update=False
                 print(f"  No aspect entities, copied retriever_outputs.txt to retriever_outputs_linked.txt")
         
         # Step 9: Create multi-scale hypergraph representation folder
-        print(f"\nStep 9: Creating multi-scale hypergraph representation folder...")
-        create_multi_scale_hypergraph_representation(data_dir)
+        # Ablation: use single-scale L1 only if multi-scale hypergraph is disabled
+        use_multi_scale = not (ablation_config and not ablation_config.use_multi_scale_hypergraph)
+        
+        if use_multi_scale:
+            print(f"\nStep 9: Creating multi-scale hypergraph representation folder...")
+            create_multi_scale_hypergraph_representation(data_dir)
+        else:
+            print(f"\n⚠️  [ABLATION] Multi-scale hypergraph is disabled (w/o Multi-Scale Hypergraph)")
+            print(f"  Creating single-scale (L1 only) representation...")
+            create_single_scale_hypergraph_representation(data_dir)
         
         return True
         
@@ -410,11 +501,40 @@ def s4_to_retrieval(data_dir, dataset_name=None, iteration=1, force_update=False
         print(f"  Query entities file saved for future use: {query_file}")
 
 
+def create_single_scale_hypergraph_representation(data_dir):
+    """
+    Create single-scale hypergraph representation (L1 only, for ablation experiments).
+    
+    Args:
+        data_dir: Data directory path
+    """
+    message_pool_dir = os.path.join(data_dir, "message_pool")
+    multi_scale_dir = os.path.join(message_pool_dir, "multi_scale_hypergraph")
+    
+    # Create multi-scale hypergraph representation folder
+    os.makedirs(multi_scale_dir, exist_ok=True)
+    
+    # Use only L1 (integration_top_pair.txt)
+    source_file = os.path.join(message_pool_dir, "integration_top_pair.txt")
+    target_file = os.path.join(multi_scale_dir, "L1_hypergraph.txt")
+    
+    if os.path.exists(source_file):
+        import shutil
+        shutil.copy2(source_file, target_file)
+        # Create empty L2 and L3 files (to prevent errors in subsequent processes)
+        open(os.path.join(multi_scale_dir, "L2_hypergraph.txt"), 'w').close()
+        open(os.path.join(multi_scale_dir, "L3_hypergraph.txt"), 'w').close()
+        print(f"  Created single-scale (L1 only) hypergraph: {target_file}")
+        print(f"  Location: {multi_scale_dir}")
+    else:
+        print(f"  Warning: Source file not found for L1 scale: {source_file}")
+
+
 def create_multi_scale_hypergraph_representation(data_dir):
     """
-    Create multi-scale hypergraph representation folder
+    Create multi-scale hypergraph representation folder.
     
-    Create multi-scale hypergraph representation folder under message_pool directory, containing:
+    Creates multi-scale hypergraph representation folder under message_pool directory, including:
     - L1 scale hypergraph: Simple-HHEA top-k results (integration_top_pair.txt)
     - L2 scale hypergraph: Retrieval results (retriever_outputs.txt)
     - L3 scale hypergraph: Linked retrieval results (retriever_outputs_linked.txt)
@@ -435,7 +555,7 @@ def create_multi_scale_hypergraph_representation(data_dir):
         'L3': os.path.join(message_pool_dir, "retriever_outputs_linked.txt")
     }
     
-    # Target file paths (renamed)
+    # Target file paths (rename)
     target_files = {
         'L1': os.path.join(multi_scale_dir, "L1_hypergraph.txt"),
         'L2': os.path.join(multi_scale_dir, "L2_hypergraph.txt"),
@@ -467,12 +587,12 @@ def create_multi_scale_hypergraph_representation(data_dir):
 
 def link_retrieval_results_to_original(data_dir, aspect_mapping, retrieval_output_file, linked_output_file):
     """
-    Link aspect entities in retrieval results back to original entities
+    Link aspect entities in retrieval results back to original entities.
     
     Args:
         data_dir: Data directory
         aspect_mapping: Mapping from aspect to original entity {aspect_id: original_kg2_id}
-        retrieval_output_file: Retrieval output file path
+        retrieval_output_file: Retrieval result file path
         linked_output_file: Linked output file path
     """
     if not os.path.exists(retrieval_output_file):
@@ -495,7 +615,7 @@ def link_retrieval_results_to_original(data_dir, aspect_mapping, retrieval_outpu
                 kg1_id = parts[0]
                 retrieved_id = int(parts[1])
                 
-                # Check if it's an aspect entity
+                # Check if it is an aspect entity
                 if retrieved_id in aspect_mapping:
                     # Link to original entity
                     original_id = aspect_mapping[retrieved_id]
@@ -514,11 +634,11 @@ def link_retrieval_results_to_original(data_dir, aspect_mapping, retrieval_outpu
 
 
 def main():
-    """Main function"""
+    """Main function."""
     import argparse
     
     parser = argparse.ArgumentParser(
-        description="Connect Simple-HHEA output and Neural Retrieval",
+        description="Stage 2: Scale-Adaptive Entity Projection",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Example usage:
@@ -555,12 +675,12 @@ Example usage:
     
     if success:
         print("\n" + "=" * 80)
-        print("✓ S4 to Retrieval process completed successfully!")
+        print("✓ Stage 2: Scale-Adaptive Entity Projection completed successfully!")
         print("=" * 80 + "\n")
         sys.exit(0)
     else:
         print("\n" + "=" * 80)
-        print("✗ S4 to Retrieval process failed!")
+        print("✗ Stage 2: Scale-Adaptive Entity Projection failed!")
         print("=" * 80 + "\n")
         sys.exit(1)
 

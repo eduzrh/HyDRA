@@ -2,18 +2,18 @@
 """
 Relation Alignment Script
 
-Features:
-1. Load relation names from KG1 and KG2
-2. Find similar/equivalent relation pairs through multiple methods:
+Functionality:
+1. Load KG1 and KG2 relation names
+2. Find similar/equivalent relation pairs using multiple methods:
    - Text similarity (based on relation names)
-   - Co-occurrence patterns (relation co-occurrence in entity pairs)
+   - Co-occurrence patterns (relations co-occurring in entity pairs)
    - Structural similarity (head-tail entity distribution of relations)
 
 Input:
 - data_dir: Data directory path
 - rel_ids_1: KG1 relation file
 - rel_ids_2: KG2 relation file
-- entity_pairs: Entity alignment pair file (optional, for co-occurrence analysis)
+- entity_pairs: Entity alignment pairs file (optional, for co-occurrence analysis)
 
 Output:
 - relation_alignment.txt: Relation alignment results
@@ -32,7 +32,7 @@ sys.path.append(project_root)
 
 def load_relations(rel_file_path):
     """
-    Load relation ID to relation name mapping
+    Load relation ID to relation name mapping.
     
     Args:
         rel_file_path: Relation file path
@@ -62,7 +62,7 @@ def load_relations(rel_file_path):
 
 def load_triples(triples_file_path):
     """
-    Load triples
+    Load triples.
     
     Args:
         triples_file_path: Triples file path
@@ -95,7 +95,7 @@ def load_triples(triples_file_path):
 
 def load_entity_pairs(pairs_file_path):
     """
-    Load entity alignment pairs
+    Load entity alignment pairs.
     
     Args:
         pairs_file_path: Entity pairs file path
@@ -125,7 +125,7 @@ def load_entity_pairs(pairs_file_path):
 
 def text_similarity(name1, name2):
     """
-    Calculate text similarity between two relation names
+    Calculate text similarity between two relation names.
     
     Args:
         name1: Relation name 1
@@ -149,7 +149,7 @@ def text_similarity(name1, name2):
     words1 = set(name1_lower.split())
     words2 = set(name2_lower.split())
     
-    # Remove common stop words
+    # Remove common stopwords
     stopwords = {'a', 'an', 'the', 'of', 'in', 'on', 'at', 'to', 'for', 'with', 'by', 'or', 'and'}
     words1 = words1 - stopwords
     words2 = words2 - stopwords
@@ -165,7 +165,7 @@ def text_similarity(name1, name2):
 
 def compute_cooccurrence_patterns(kg1_triples, kg2_triples, entity_pairs):
     """
-    Calculate co-occurrence patterns of relations in entity pairs
+    Compute co-occurrence patterns of relations in entity pairs.
     
     Args:
         kg1_triples: KG1 triples list
@@ -179,27 +179,27 @@ def compute_cooccurrence_patterns(kg1_triples, kg2_triples, entity_pairs):
     kg1_to_kg2 = {kg1_id: kg2_id for kg1_id, kg2_id in entity_pairs}
     kg2_to_kg1 = {kg2_id: kg1_id for kg1_id, kg2_id in entity_pairs}
     
-    # Build KG1 entity-relation mapping {kg1_entity_id: {rel_id: set(tail_ids)}}
+    # Build KG1 entity relation mapping {kg1_entity_id: {rel_id: set(tail_ids)}}
     kg1_entity_rels = defaultdict(lambda: defaultdict(set))
     for head, rel, tail, _, _ in kg1_triples:
         kg1_entity_rels[head][rel].add(tail)
     
-    # Build KG2 entity-relation mapping {kg2_entity_id: {rel_id: set(tail_ids)}}
+    # Build KG2 entity relation mapping {kg2_entity_id: {rel_id: set(tail_ids)}}
     kg2_entity_rels = defaultdict(lambda: defaultdict(set))
     for head, rel, tail, _, _ in kg2_triples:
         kg2_entity_rels[head][rel].add(tail)
     
-    # Calculate co-occurrence
+    # Compute co-occurrence
     cooccurrence = defaultdict(int)
     
     for kg1_id, kg2_id in entity_pairs:
         kg1_rels = kg1_entity_rels.get(kg1_id, {})
         kg2_rels = kg2_entity_rels.get(kg2_id, {})
         
-        # For each KG1 relation, find possible corresponding relations in KG2
+        # For each KG1 relation, find corresponding relations in KG2
         for kg1_rel, kg1_tails in kg1_rels.items():
             for kg2_rel, kg2_tails in kg2_rels.items():
-                # If two relations have the same tail entity (through entity alignment mapping), they co-occur
+                # If two relations have the same tail entities (through entity alignment mapping), co-occur
                 kg1_tail_set = set(kg1_tails)
                 kg2_tail_set = set(kg2_tails)
                 
@@ -220,7 +220,7 @@ def compute_cooccurrence_patterns(kg1_triples, kg2_triples, entity_pairs):
 
 def find_relation_alignments(data_dir, use_cooccurrence=True, text_sim_threshold=0.3):
     """
-    Find relation alignment pairs
+    Find relation alignment pairs.
     
     Args:
         data_dir: Data directory path
@@ -278,7 +278,7 @@ def find_relation_alignments(data_dir, use_cooccurrence=True, text_sim_threshold
             if kg1_triples and kg2_triples:
                 cooccurrence = compute_cooccurrence_patterns(kg1_triples, kg2_triples, entity_pairs)
                 
-                # Normalize co-occurrence scores (using logarithmic scaling)
+                # Normalize co-occurrence scores (using log scaling)
                 max_cooccur = max(cooccurrence.values()) if cooccurrence else 1
                 for (kg1_rel_id, kg2_rel_id), count in cooccurrence.items():
                     # Normalize to 0-1 range
@@ -289,7 +289,7 @@ def find_relation_alignments(data_dir, use_cooccurrence=True, text_sim_threshold
         else:
             print("  Skipped: No entity pairs found for co-occurrence analysis")
     
-    # Deduplicate and merge identical relation pairs
+    # Deduplicate and merge same relation pairs
     alignment_dict = {}
     for kg1_rel_id, kg2_rel_id, score, method in alignments:
         key = (kg1_rel_id, kg2_rel_id)
@@ -311,7 +311,7 @@ def find_relation_alignments(data_dir, use_cooccurrence=True, text_sim_threshold
 
 def save_relation_alignments(alignments, kg1_relations, kg2_relations, output_file):
     """
-    Save relation alignment results
+    Save relation alignment results.
     
     Args:
         alignments: Alignment results list

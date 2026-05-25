@@ -543,7 +543,7 @@ If you find this work helpful for your research or applications, we would apprec
 
 The following open source projects were partially referenced in this work. We sincerely appreciate their contributions:
 
-[Dual-AMN](https://github.com/MaoXinn/Dual-AMN), [JAPE](https://github.com/nju-websoft/JAPE), [GCN-Align](https://github.com/1049451037/GCN-Align), [Simple-HHEA](https://github.com/jxh4945777/Simple-HHEA), [BETA](https://github.com/DexterZeng/BETA), [Dual-Match](https://github.com/ZJU-DAILY/DualMatch/), [Faiss](https://github.com/facebookresearch/faiss), [NetworkX](https://github.com/networkx/networkx), [AdaCoAgentEA](https://github.com/eduzrh/AdaCoAgentEA), [DAEA](https://github.com/yangxiaoxiaoly/DAEA), [AGROLD, DOREMUS](https://github.com/EnsiyehRaoufi/Create_Input_Data_to_EA_Models), [LargeTKGA Datasets](https://huggingface.co/datasets/knowledgeAnonymous/LargeTKGA)
+[Dual-AMN](https://github.com/MaoXinn/Dual-AMN), [JAPE](https://github.com/nju-websoft/JAPE), [GCN-Align](https://github.com/1049451037/GCN-Align), [Simple-HHEA](https://github.com/jxh4945777/Simple-HHEA), [BETA](https://github.com/DexterZeng/BETA), [Dual-Match](https://github.com/ZJU-DAILY/DualMatch/), [Faiss](https://github.com/facebookresearch/faiss), [NetworkX](https://github.com/networkx/networkx), [AdaCoAgentEA](https://github.com/eduzrh/AdaCoAgentEA), [DAEA](https://github.com/yangxiaoxiaoly/DAEA), [AGROLD, DOREMUS](https://github.com/EnsiyehRaoufi/Create_Input_Data_to_EA_Models), [LargeTKGA Datasets](https://huggingface.co/datasets/knowledgeAnonymous/LargeTKGA), [LargeKGA Datasets](https://github.com/DexterZeng/LIME),[ELsEA](https://github.com/wx-qzhou/ELsEA)
 
 ---
 

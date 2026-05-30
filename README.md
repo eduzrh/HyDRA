@@ -498,6 +498,18 @@ If you find this work helpful for your research or applications, we would apprec
 
 ## 🔗 References
 
+* EasyEA: Large Language Model is All You Need in Entity Alignment Between Knowledge Graphs.
+  Jingwei Cheng, Chenglong Lu, Linyan Yang, Guoqing Chen, and Fu Zhang.
+  Findings of the Association for Computational Linguistics (ACL Findings), 2025.
+* On entity alignment at scale.
+  Weixin Zeng, Xiang Zhao, Xinyi Li, Jiuyang Tang, and Wei Wang.
+  The VLDB Journal, 2022.
+* High-quality Task Division for Large-scale Entity Alignment.
+  Binfeng Liu, Wen Hua, Guido Zuccon, Genghao Zhao, and Xike Zhang.
+  Proceedings of the ACM International Conference on Information and Knowledge Management (CIKM), 2022.
+* Enhancing Large-scale Entity Alignment with Critical Structure and High-quality Context.
+  Qian Zhou, Chen Wei, Zhang Li, Zhao Pengpeng, Xu Jiajie, and Zhao Lei.
+  IEEE International Conference on Data Engineering (ICDE), 2025.
 * [Unsupervised Entity Alignment for Temporal Knowledge Graphs](https://doi.org/10.1145/3543507.3583381).
   Xiaoze Liu, Junyang Wu, Tianyi Li, Lu Chen, and Yunjun Gao.
   Proceedings of the ACM Web Conference (WWW), 2023.

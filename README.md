@@ -7,9 +7,6 @@
 </h1>
 
 
-
-<h3>—————— Under Review at IEEE TPAMI ——————</h3>
-
 </div>
 
 

@@ -137,7 +137,7 @@ def load_ents(path):
     return data
 
 
-def retrieve_top_k_entities(query, retriever, k=5):
+def retrieve_top_k_entities(query, retriever, k=10):
     """
     Use FAISS to retrieve TOP-K entities for given query
     Args:
@@ -180,7 +180,7 @@ def setup_retriever(api_base, api_key, retriever_document_path, faiss_index_path
     db = FAISS.load_local(faiss_index_path, embeddings, allow_dangerous_deserialization=True)
     retriever = db.as_retriever(
         search_type="mmr",
-        search_kwargs={"k": 5, "fetch_k": 5}  # Reduced from fetch_k=10 to 5
+        search_kwargs={"k": 5, "fetch_k": 5}  # k2 in {3, 5, 8, 10, 12, 15, 20}
     )
     # retriever = db.as_retriever(search_type="similarity_score_threshold",
     #                             search_kwargs={"score_threshold": 0.5})
@@ -368,6 +368,7 @@ def neural_retrieval(data_dir, force_rebuild_index=False, max_entities=None, fil
     S1_PRIVATE_MESSAGE_POOL = {
         'top_k_candidate_entities': os.path.join(data_dir, "message_pool", "retriever_outputs.txt"),
     }
+    # k2 in {3, 5, 8, 10, 12, 15, 20}
     config_top_k = 5
 
     config = {

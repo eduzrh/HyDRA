@@ -80,7 +80,9 @@ def ensure_ent_ids_1_restored(data_dir):
         return False
 
 
-def run_s4_training(data_dir, cuda=0, epochs=500, skip_encoding_integration=False, multi_granularity_time=False, ablation_config=None):
+def run_s4_training(data_dir, cuda=0, epochs=500, skip_encoding_integration=False,
+                    multi_granularity_time=False, add_noise=False, noise_ratio=0.0,
+                    ablation_config=None):
     """Run Stage 1: Encoding and Integration."""
     print("\n" + "=" * 80)
     print("Stage 1: Encoding and Integration")
@@ -120,6 +122,10 @@ def run_s4_training(data_dir, cuda=0, epochs=500, skip_encoding_integration=Fals
             
             if use_multi_gran:
                 cmd.append('--multi_granularity_time')
+            
+            cmd.extend(['--noise_ratio', str(noise_ratio)])
+            if add_noise:
+                cmd.append('--add_noise')
             
             print(f"Running command: {' '.join(cmd)}")
             result = subprocess.run(cmd, check=True, capture_output=False)
@@ -172,7 +178,7 @@ def run_multi_scale_fusion(data_dir, ablation_config=None):
         return False
 
 
-def run_full_pipeline(data_dir, skip_s4=False, only_s4=False, cuda=0, epochs=500, max_iterations=3, min_kg1_entities=50, skip_encoding_integration=False, multi_granularity_time=False, ablation_config=None):
+def run_full_pipeline(data_dir, skip_s4=False, only_s4=False, cuda=0, epochs=500, max_iterations=3, min_kg1_entities=50, skip_encoding_integration=False, multi_granularity_time=False, add_noise=False, noise_ratio=0.0, ablation_config=None):
     """Run the complete HyDRA pipeline with iteration control and ablation support."""
     if ablation_config is None:
         ablation_config = AblationConfig()
@@ -183,6 +189,7 @@ def run_full_pipeline(data_dir, skip_s4=False, only_s4=False, cuda=0, epochs=500
     print(f"Data directory: {data_dir}")
     print(f"Max iterations: {max_iterations}")
     print(f"Min KG1 entities threshold: {min_kg1_entities}")
+    print(f"Name-embedding noise (Sec. 5.6): add_noise={add_noise}, noise_ratio={noise_ratio}")
     print(f"Ablation Config: {ablation_config.get_description()}")
     print("=" * 80 + "\n")
     
@@ -197,7 +204,7 @@ def run_full_pipeline(data_dir, skip_s4=False, only_s4=False, cuda=0, epochs=500
                 print("✓ Encoding and Integration output file already exists")
                 success_steps.append("Encoding and Integration (already exists)")
             else:
-                if run_s4_training(data_dir, cuda=cuda, epochs=epochs, skip_encoding_integration=skip_encoding_integration, multi_granularity_time=multi_granularity_time, ablation_config=ablation_config):
+                if run_s4_training(data_dir, cuda=cuda, epochs=epochs, skip_encoding_integration=skip_encoding_integration, multi_granularity_time=multi_granularity_time, add_noise=add_noise, noise_ratio=noise_ratio, ablation_config=ablation_config):
                     success_steps.append("Encoding and Integration")
                 else:
                     print("✗ Encoding and Integration failed")
@@ -236,7 +243,7 @@ def run_full_pipeline(data_dir, skip_s4=False, only_s4=False, cuda=0, epochs=500
         else:
             if iteration > 1:
                 print(f"  Re-running Encoding and Integration for iteration {iteration}...")
-            if run_s4_training(data_dir, cuda=cuda, epochs=epochs, skip_encoding_integration=skip_encoding_integration, multi_granularity_time=multi_granularity_time):
+            if run_s4_training(data_dir, cuda=cuda, epochs=epochs, skip_encoding_integration=skip_encoding_integration, multi_granularity_time=multi_granularity_time, add_noise=add_noise, noise_ratio=noise_ratio, ablation_config=ablation_config):
                 success_steps.append("Encoding and Integration")
             else:
                 print("✗ Encoding and Integration failed")
@@ -334,6 +341,7 @@ Examples:
   python HyDRA_main.py --data_dir icews_wiki --skip_s4
   python HyDRA_main.py --data_dir icews_wiki --only_s4
   python HyDRA_main.py --data_dir icews_wiki --max_iterations 5 --min_kg1_entities 100
+  python HyDRA_main.py --data_dir WildBETA --multi_granularity_time --add_noise --noise_ratio 0.8
         """
     )
     
@@ -394,6 +402,22 @@ Examples:
         "--multi_granularity_time",
         action="store_true",
         help="Enable multi-granularity temporal modeling (default: False)"
+    )
+    
+    robustness_group = parser.add_argument_group(
+        'Robustness (Sec. 5.6)',
+        'Name-embedding noise injected in Stage 1 (Simple-HHEA) for embedding-degradation experiments',
+    )
+    robustness_group.add_argument(
+        "--add_noise",
+        action="store_true",
+        help="Zero out a fraction of name-embedding dimensions before encoding (paper Sec. 5.6)",
+    )
+    robustness_group.add_argument(
+        "--noise_ratio",
+        type=float,
+        default=0.0,
+        help="Fraction of 64-d name-embedding dims to mask when --add_noise is set (0.0--1.0, e.g. 0.8 for 80%%)",
     )
     
     ablation_group = parser.add_argument_group('Ablation Experiments', 'Ablation options for component evaluation')
@@ -473,6 +497,9 @@ Examples:
     
     args = parser.parse_args()
     
+    if args.add_noise and not (0.0 <= args.noise_ratio <= 1.0):
+        parser.error("--noise_ratio must be between 0.0 and 1.0 when --add_noise is enabled")
+    
     ablation_config = AblationConfig()
     ablation_applied = False
     
@@ -535,6 +562,8 @@ Examples:
         min_kg1_entities=args.min_kg1_entities,
         skip_encoding_integration=args.skip_encoding_integration,
         multi_granularity_time=args.multi_granularity_time,
+        add_noise=args.add_noise,
+        noise_ratio=args.noise_ratio,
         ablation_config=ablation_config
     )
     

@@ -1,15 +1,44 @@
+<div align="center">
+
+<h1>
+
 ✨ Towards Temporal Knowledge Graph Alignment in the Wild ✨
 
-[Version 1.0.0](https://github.com/eduzrh/HyDRA)
-[Language: Python 3](https://www.python.org/)
-[Made with PyTorch](https://www.pytorch.org/)
-[License: MIT](LICENSE)
-[Contributions Welcome](https://github.com/eduzrh/HyDRA/issues)
+</h1>
+
+
+</div>
+
+
+
+<div align="center">
+
+[![Version 1.0.0](https://img.shields.io/badge/version-1.0.0-blue)](https://github.com/eduzrh/HyDRA)
+[![Language: Python 3](https://img.shields.io/badge/Language-Python3-blue.svg?style=flat-square)](https://www.python.org/)
+[![Made with PyTorch](https://img.shields.io/badge/Made%20with-pytorch-orange.svg?style=flat-square)](https://www.pytorch.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](LICENSE)
+[![Contributions Welcome](https://img.shields.io/badge/Contributions-Welcome-brightgreen.svg?style=flat-square)](https://github.com/eduzrh/HyDRA/issues)
 
 [English](README.md) | [简体中文](./README_zh_CN.md)
 
-**[📰 Introduction](#-introduction)** | **[🏗️ Architecture](#architecture)** | **[⚙️ Installation](#installation)** | **[🚀 Quick Start](#-quick-start)**  
-**[📦 Datasets](#-datasets)** | **[📖 Usage](#-usage)** | **[🔬 Reproducibility](#-reproducibility)** | **[📜 License](#-license)** | **[📬 Contact📑 Citation](#-contact)**
+</div>
+
+
+
+<p align="center">
+  <a href="#-introduction"><b>📰 Introduction</b></a> |
+  <a href="#architecture"><b>🏗️ Architecture</b></a> |
+  <a href="#installation"><b>⚙️ Installation</b></a> |
+  <a href="#-quick-start"><b>🚀 Quick Start</b></a> <br>
+  <a href="#-datasets"><b>📦 Datasets</b></a> |
+  <a href="#-usage"><b>📖 Usage</b></a> |
+  <a href="#-reproducibility"><b>🔬 Reproducibility</b></a> |
+  <a href="#-license"><b>📜 License</b></a> |
+  <a href="#-contact"><b>📬 Contact</b></a>
+  <a href="#-citation"><b>📑 Citation</b></a>
+</p>
+
+
 
 ---
 

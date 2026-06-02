@@ -1,29 +1,44 @@
+<div align="center">
 
-
-
+<h1>
 
 ✨ Towards Temporal Knowledge Graph Alignment in the Wild ✨
 
+</h1>
 
 
-### —————— 投稿于 IEEE TPAMI ——————
+</div>
 
 
 
+<div align="center">
 
-
-[Version 1.0.0](https://github.com/eduzrh/HyDRA)
-[Language: Python 3](https://www.python.org/)
-[Made with PyTorch](https://www.pytorch.org/)
-[License: MIT](LICENSE)
-[Contributions Welcome](https://github.com/eduzrh/HyDRA/issues)
+[![Version 1.0.0](https://img.shields.io/badge/version-1.0.0-blue)](https://github.com/eduzrh/HyDRA)
+[![Language: Python 3](https://img.shields.io/badge/Language-Python3-blue.svg?style=flat-square)](https://www.python.org/)
+[![Made with PyTorch](https://img.shields.io/badge/Made%20with-pytorch-orange.svg?style=flat-square)](https://www.pytorch.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](LICENSE)
+[![Contributions Welcome](https://img.shields.io/badge/Contributions-Welcome-brightgreen.svg?style=flat-square)](https://github.com/eduzrh/HyDRA/issues)
 
 [English](README.md) | [简体中文](./README_zh_CN.md)
 
+</div>
 
 
-**[📰 简介](#-introduction)** | **[🏗️ 架构](#architecture)** | **[⚙️ 安装](#installation)** | **[🚀 快速开始](#-quick-start)**   
-**[📦 数据集](#-datasets)** | **[📖 使用说明](#-usage)** | **[🔬 可复现性](#-reproducibility)** | **[📜 许可证](#-license)** | **[📬 联系方式📑 引用](#-contact)**
+
+<p align="center">
+  <a href="#-introduction"><b>📰 简介</b></a> |
+  <a href="#architecture"><b>🏗️ 架构</b></a> |
+  <a href="#installation"><b>⚙️ 安装</b></a> |
+  <a href="#-quick-start"><b>🚀 快速开始</b></a> <br>
+  <a href="#-datasets"><b>📦 数据集</b></a> |
+  <a href="#-usage"><b>📖 使用说明</b></a> |
+  <a href="#-reproducibility"><b>🔬 可复现性</b></a> |
+  <a href="#-license"><b>📜 许可证</b></a> |
+  <a href="#-contact"><b>📬 联系方式</b></a>
+  <a href="#-citation"><b>📑 引用</b></a>
+</p>
+
+
 
 ---
 

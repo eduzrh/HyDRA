@@ -158,7 +158,7 @@ def run_s4_to_retrieval(data_dir, iteration=1, ablation_config=None):
         return False
 
 
-def run_multi_scale_fusion(data_dir, ablation_config=None):
+def run_multi_scale_fusion(data_dir, ablation_config=None, snapshot_sup_pairs=False, iteration=0):
     """Run Stage 4: Multi-Scale Fusion."""
     print("\n" + "=" * 80)
     print("Stage 4: Multi-Scale Fusion")
@@ -166,7 +166,10 @@ def run_multi_scale_fusion(data_dir, ablation_config=None):
     
     try:
         from multi_scale_fusion.multi_scale_fusion import multi_scale_fusion
-        aligned_pairs = multi_scale_fusion(data_dir, ablation_config=ablation_config)
+        aligned_pairs = multi_scale_fusion(
+            data_dir, ablation_config=ablation_config,
+            snapshot_sup_pairs=snapshot_sup_pairs, iteration=iteration
+        )
         return aligned_pairs is not None and len(aligned_pairs) > 0
     except ImportError as e:
         print(f"Error importing multi_scale_fusion: {e}")
@@ -178,7 +181,7 @@ def run_multi_scale_fusion(data_dir, ablation_config=None):
         return False
 
 
-def run_full_pipeline(data_dir, skip_s4=False, only_s4=False, cuda=0, epochs=500, max_iterations=3, min_kg1_entities=50, skip_encoding_integration=False, multi_granularity_time=False, add_noise=False, noise_ratio=0.0, ablation_config=None):
+def run_full_pipeline(data_dir, skip_s4=False, only_s4=False, cuda=0, epochs=500, max_iterations=3, min_kg1_entities=50, skip_encoding_integration=False, multi_granularity_time=False, add_noise=False, noise_ratio=0.0, ablation_config=None, snapshot_sup_pairs=False):
     """Run the complete HyDRA pipeline with iteration control and ablation support."""
     if ablation_config is None:
         ablation_config = AblationConfig()
@@ -269,7 +272,8 @@ def run_full_pipeline(data_dir, skip_s4=False, only_s4=False, cuda=0, epochs=500
                 return False
             continue
         
-        if run_multi_scale_fusion(data_dir, ablation_config=ablation_config):
+        if run_multi_scale_fusion(data_dir, ablation_config=ablation_config,
+                                  snapshot_sup_pairs=snapshot_sup_pairs, iteration=iteration):
             success_steps.append("Multi-Scale Fusion")
         else:
             print("✗ Multi-Scale Fusion failed")
@@ -419,7 +423,13 @@ Examples:
         default=0.0,
         help="Fraction of 64-d name-embedding dims to mask when --add_noise is set (0.0--1.0, e.g. 0.8 for 80%%)",
     )
-    
+
+    parser.add_argument(
+        "--snapshot_sup_pairs",
+        action="store_true",
+        help="Snapshot sup_pairs after each iteration for pseudo-label tracking"
+    )
+
     ablation_group = parser.add_argument_group('Ablation Experiments', 'Ablation options for component evaluation')
     
     ablation_group.add_argument(
@@ -494,6 +504,12 @@ Examples:
         action="store_true",
         help="Ablation: Remove conflict detection"
     )
+    ablation_group.add_argument(
+        "--w/SingleScaleAllEqualL1",
+        dest="w_single_scale_all_equal_l1",
+        action="store_true",
+        help="Ablation: Copy L1 candidates into L2 and L3, isolating fusion reasoning"
+    )
     
     args = parser.parse_args()
     
@@ -539,6 +555,9 @@ Examples:
     if getattr(args, 'wo_conflict_detection', False):
         ablation_config.apply_ablation('w/oConflictDetection')
         ablation_applied = True
+    if getattr(args, 'w_single_scale_all_equal_l1', False):
+        ablation_config.apply_ablation('w/SingleScaleAllEqualL1')
+        ablation_applied = True
     
     if not ablation_applied:
         ablation_config = None
@@ -564,7 +583,8 @@ Examples:
         multi_granularity_time=args.multi_granularity_time,
         add_noise=args.add_noise,
         noise_ratio=args.noise_ratio,
-        ablation_config=ablation_config
+        ablation_config=ablation_config,
+        snapshot_sup_pairs=args.snapshot_sup_pairs
     )
     
     if success:

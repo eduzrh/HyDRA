@@ -255,7 +255,7 @@ python HyDRA_main.py --data_dir data/WildBETA \
 
 HyDRA 支持多粒度时序建模（年和月级别）以处理多粒度时序共存。对 BETA/WildBETA 建议在 `HyDRA_main.py` 上加 `--multi_granularity_time`。
 
-### 嵌入噪声鲁棒性（论文 5.6 节）
+### 嵌入噪声鲁棒性
 
 论文 5.6 节在 Stage 1 对实体名称嵌入施加退化。完整流程通过 `--add_noise` 与 `--noise_ratio` 传入 Simple-HHEA（随机将部分 64 维名称嵌入置零）：
 
@@ -404,7 +404,7 @@ NeurIPS 2024 Track on Datasets and Benchmarks
 
 以下开源项目在本工作中被部分引用。我们真诚地感谢他们的贡献：
 
-[Dual-AMN](https://github.com/MaoXinn/Dual-AMN), [JAPE](https://github.com/nju-websoft/JAPE), [GCN-Align](https://github.com/1049451037/GCN-Align), [Simple-HHEA](https://github.com/jxh4945777/Simple-HHEA), [BETA](https://github.com/DexterZeng/BETA), [Dual-Match](https://github.com/ZJU-DAILY/DualMatch/), [Faiss](https://github.com/facebookresearch/faiss), [NetworkX](https://github.com/networkx/networkx), [AdaCoAgentEA](https://github.com/eduzrh/AdaCoAgentEA), [DAEA](https://github.com/yangxiaoxiaoly/DAEA), [AGROLD, DOREMUS](https://github.com/EnsiyehRaoufi/Create_Input_Data_to_EA_Models)
+[Dual-AMN](https://github.com/MaoXinn/Dual-AMN), [JAPE](https://github.com/nju-websoft/JAPE), [GCN-Align](https://github.com/1049451037/GCN-Align), [Simple-HHEA](https://github.com/jxh4945777/Simple-HHEA), [BETA](https://github.com/DexterZeng/BETA), [Dual-Match](https://github.com/ZJU-DAILY/DualMatch/), [Faiss](https://github.com/facebookresearch/faiss), [NetworkX](https://github.com/networkx/networkx), [AdaCoAgentEA](https://github.com/eduzrh/AdaCoAgentEA), [DAEA](https://github.com/yangxiaoxiaoly/DAEA), [AGROLD, DOREMUS](https://github.com/EnsiyehRaoufi/Create_Input_Data_to_EA_Models), [LargeTKGA Datasets](https://huggingface.co/datasets/knowledgeAnonymous/LargeTKGA), [LargeKGA Datasets](https://github.com/DexterZeng/LIME),[ELsEA](https://github.com/wx-qzhou/ELsEA)
 
 ---
 

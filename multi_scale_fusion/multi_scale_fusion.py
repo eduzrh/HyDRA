@@ -203,14 +203,16 @@ def get_entity_context(entity_id, entity_names, triples=None, rel_names=None, n=
     return context
 
 
-def multi_scale_fusion(data_dir, output_file=None, ablation_config=None):
+def multi_scale_fusion(data_dir, output_file=None, ablation_config=None, snapshot_sup_pairs=False, iteration=0):
     """
     Multi-scale interaction-augmented fusion.
-    
+
     Args:
         data_dir: Data directory path
         output_file: Output file path (default: message_pool/multi_scale_fusion_results.txt)
         ablation_config: Ablation experiment configuration (AblationConfig object)
+        snapshot_sup_pairs: If True, save a snapshot of sup_pairs after fusion
+        iteration: Iteration number for naming the snapshot file
     """
     print("\n" + "=" * 80)
     print("Stage 4: Multi-Scale Fusion")
@@ -291,7 +293,18 @@ def multi_scale_fusion(data_dir, output_file=None, ablation_config=None):
     if not multi_scale_pairs:
         print("Error: No multi-scale pairs found. Please run Stage 2: Scale-Adaptive Entity Projection first.")
         return []
-    
+
+
+    if getattr(ablation_config, 'use_all_scales_equal_l1', False):
+        n_modified = 0
+        for kg1_id in multi_scale_pairs:
+            l1_list = multi_scale_pairs[kg1_id]['L1']
+            if l1_list:
+                multi_scale_pairs[kg1_id]['L2'][:] = list(l1_list)
+                multi_scale_pairs[kg1_id]['L3'][:] = list(l1_list)
+                n_modified += 1
+        print(f"  [ABLATION] All scales set equal to L1 for {n_modified} entities")
+
     # Set OpenAI client
     client = OpenAI(
         base_url="xxx",
@@ -519,7 +532,15 @@ IMPORTANT:
         if added_count > 0:
             print(f"✓ Successfully added {added_count} new pairs to sup_pairs")
         print()
-    
+
+    # Snapshot sup_pairs for pseudo-label tracking
+    if snapshot_sup_pairs:
+        sup_file = os.path.join(data_dir, 'sup_pairs')
+        snapshot_file = os.path.join(data_dir, f'sup_pairs_iter{iteration}.txt')
+        import shutil
+        shutil.copy2(sup_file, snapshot_file)
+        print(f"[Snapshot] sup_pairs saved to {snapshot_file}")
+
     return aligned_pairs
 
 

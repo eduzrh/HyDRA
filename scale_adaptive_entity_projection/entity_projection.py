@@ -31,6 +31,7 @@ sys.path.append(project_root)
 
 from multi_scale_hypergraph_retrieval.neural_retrieval import neural_retrieval
 from multi_scale_hypergraph_retrieval.hypergraph_decomposition import run_hypergraph_decomposition
+from ablation_config import copy_l1_to_l2_l3
 from scale_adaptive_entity_projection.run_relation_alignment import run_relation_alignment_stage
 
 
@@ -477,6 +478,9 @@ def s4_to_retrieval(data_dir, dataset_name=None, iteration=1, force_update=False
         if use_multi_scale:
             print(f"\nStep 9: Creating multi-scale hypergraph representation folder...")
             create_multi_scale_hypergraph_representation(data_dir)
+            # Ablation: w/SingleScaleAllEqualL1 — make all scales equal to L1
+            if ablation_config and ablation_config.use_all_scales_equal_l1:
+                copy_l1_to_l2_l3(data_dir)
         else:
             print(f"\n⚠️  [ABLATION] Multi-scale hypergraph is disabled (w/o Multi-Scale Hypergraph)")
             print(f"  Creating single-scale (L1 only) representation...")

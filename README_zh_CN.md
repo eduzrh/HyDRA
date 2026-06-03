@@ -171,7 +171,7 @@ pip install -r requirements.txt
 - `time_id`: 源知识图谱和目标知识图谱中的时间 ID
 - `ref_ent_ids`: 所有对齐的实体对，格式为 `(e_s \t e_t)` 的配对列表
 
-**注意：** 实验中使用的代表性数据集来源于 [Dual-AMN](https://github.com/MaoXinn/Dual-AMN)、[JAPE](https://github.com/nju-websoft/JAPE)、[GCN-Align](https://github.com/1049451037/GCN-Align)、[BETA](https://github.com/DexterZeng/BETA)、[DAEA](https://github.com/yangxiaoxiaoly/DAEA)、[AGROLD, DOREMUS](https://github.com/EnsiyehRaoufi/Create_Input_Data_to_EA_Models) 及相关工作。
+**注意：** 实验中使用的代表性数据集来源于 [Dual-AMN](https://github.com/MaoXinn/Dual-AMN)、[JAPE](https://github.com/nju-websoft/JAPE)、[GCN-Align](https://github.com/1049451037/GCN-Align)、[BETA](https://github.com/DexterZeng/BETA)、[DAEA](https://github.com/yangxiaoxiaoly/DAEA)、[AGROLD, DOREMUS](https://github.com/EnsiyehRaoufi/Create_Input_Data_to_EA_Models)、[TimeD1M/EN-FR, TimeD1M/EN-DE, Time-FB2M](https://huggingface.co/datasets/knowledgeAnonymous/LargeTKGA)、[DBP1M/EN-FR, DBP1M/EN-DE](https://drive.google.com/file/d/15jeGD-6pVGlqI5jCn7KJfGIER6AeoQ-L/view?usp=sharing)、[FBDBP2M](https://1drv.ms/u/s!Ar-uYoG1mfiLkx97L7j4MrVUMazO?e=8SSjgt) 及相关工作。
 
 ### 大规模预处理
 
